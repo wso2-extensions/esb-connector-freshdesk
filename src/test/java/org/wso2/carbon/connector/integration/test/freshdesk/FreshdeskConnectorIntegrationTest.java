@@ -49,7 +49,7 @@ public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestB
     @BeforeClass(alwaysRun = true)
     public void setEnvironment() throws Exception {
 
-        init("freshdesk-connector-1.0.0");
+        init("freshdesk-connector-1.0.1-SNAPSHOT");
         sdf = new SimpleDateFormat("yyyy-MM-dd");
         esbRequestHeadersMap.put("Accept-Charset", "UTF-8");
         esbRequestHeadersMap.put("Content-Type", "application/json");
