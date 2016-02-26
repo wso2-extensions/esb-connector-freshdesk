@@ -134,9 +134,9 @@
         </dependency>
     </dependencies>
     <scm>
-        <connection>scm:git:https://github.com/wso2-extensions/esb-connector-kafka.git</connection>
-        <url>https://github.com/wso2-extensions/esb-connector-kafka.git</url>
-        <developerConnection>scm:git:https://github.com/wso2-extensions/esb-connector-kafka</developerConnection>
+        <connection>scm:git:https://github.com/wso2-extensions/esb-connector-freshdesk.git</connection>
+        <url>https://github.com/wso2-extensions/esb-connector-freshdesk.git</url>
+        <developerConnection>scm:git:https://github.com/wso2-extensions/esb-connector-freshdesk</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <build>
