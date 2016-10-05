@@ -18,20 +18,28 @@
 -->
 
 <template name="getTicket" xmlns="http://ws.apache.org/ns/synapse">
-    <parameter name="id" description="The unique identifier of the ticket specific to the account."/>
-
+    <parameter name="ticketId" description="The unique identifier of the ticket specific to the account."/>
     <sequence>
-        <property name="uri.var.id" expression="$func:id"/>
-
-        <call>
-            <endpoint>
-                <http method="get" uri-template="{uri.var.apiUrl}/helpdesk/tickets/{uri.var.id}.{uri.var.format}"/>
-            </endpoint>
-        </call>
-
+        <property name="uri.var.ticketId" expression="$func:ticketId"/>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
         <!-- Remove response custom header information -->
         <header name="X-Runtime" scope="transport" action="remove"/>
         <header name="X-Powered-By" scope="transport" action="remove"/>
-
     </sequence>
 </template>

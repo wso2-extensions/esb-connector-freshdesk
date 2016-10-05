@@ -1,6 +1,5 @@
 {
-	"apiUrl":"%s(apiUrl)",
-	"apiKey":"%s(apiKey)",
-	"format":"json",
-	"id":"INVALID"
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "ticketId": "Invalid"
 }

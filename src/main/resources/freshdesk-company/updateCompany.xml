@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+
+<template name="updateCompany" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters-->
+    <parameter name="companyId" description="The unique identifier of a company."/>
+    <!--Supported Parameters-->
+    <parameter name="name" description="Name of the Company."/>
+    <parameter name="description" description="Description of the Company."/>
+    <parameter name="domains" description="Domains of the company."/>
+    <parameter name="note" description="Any specific note about the company."/>
+    <parameter name="customFields" description="Key value pairs containing the names and values of custom fields."/>
+
+    <sequence>
+        <property name="uri.var.companyId" expression="$func:companyId"/>
+        <property name="uri.var.name" expression="$func:name"/>
+        <property name="uri.var.description" expression="$func:description"/>
+        <property name="uri.var.domains" expression="$func:domains"/>
+        <property name="uri.var.note" expression="$func:note"/>
+        <property name="uri.var.customFields" expression="$func:customFields"/>
+        <payloadFactory media-type="json">
+            <format>
+                {
+
+                }
+            </format>
+        </payloadFactory>
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var name = mc.getProperty('uri.var.name');
+                var description = mc.getProperty('uri.var.description');
+                var domains = mc.getProperty('uri.var.domains');
+                var note = mc.getProperty('uri.var.note');
+                var customFields = mc.getProperty('uri.var.customFields');
+                //Get the existing payload
+                var payload = mc.getPayloadJSON();
+                 if (description != null && description != "") {
+                   payload["description"]=description;
+                }
+                if (name != null && name != "") {
+                   payload["name"]=name;
+                }
+                if (domains != null && domains != "" && domains!="{}") {
+                payload.domains=eval( "(" + domains + ")" );
+                 }
+                if (note != null && note != "") {
+                   payload["note"]=note;
+                }
+                if (customFields != null && customFields != "" && customFields!="{}") {
+                   if(customFields.charCodeAt(0) == '123' ) {
+                        payload["custom_fields"]=eval( "(" + customFields + ")" );;
+                   }
+                }
+                //Set the newly constructed payload
+                mc.setPayloadJSON(payload);
+            ]]>
+        </script>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="put"
+                              uri-template="{uri.var.apiUrl}/api/v2/companies/{+uri.var.companyId}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="put"
+                              uri-template="{uri.var.apiUrl}/api/v2/companies/{+uri.var.companyId}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+        <header name="ETag" scope="transport" action="remove"/>
+    </sequence>
+</template>

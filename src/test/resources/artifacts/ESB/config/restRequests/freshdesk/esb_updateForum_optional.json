@@ -1,0 +1,7 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "forumId": "%s(forumIdOptional)",
+  "description": "Updating Forum",
+  "name": "UpdateForum"
+}

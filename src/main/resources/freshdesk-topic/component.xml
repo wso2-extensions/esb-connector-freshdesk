@@ -21,11 +21,19 @@
     <subComponents>
         <component name="createTopic">
             <file>createTopic.xml</file>
-            <description>To create a new topic in a forum.</description>
+            <description>Creates a new topic in a forum.</description>
         </component>
         <component name="getTopic">
             <file>getTopic.xml</file>
-            <description>To retrieve a topic from a forum.</description>
+            <description>Retrieves a topic from a forum.</description>
+        </component>
+        <component name="deleteTopic">
+            <file>deleteTopic.xml</file>
+            <description>Deletes a topic from a forum.</description>
+        </component>
+        <component name="updateTopic">
+            <file>updateTopic.xml</file>
+            <description>Updates a topic from a forum.</description>
         </component>
     </subComponents>
 </component>

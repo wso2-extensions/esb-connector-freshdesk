@@ -18,116 +18,100 @@
 -->
 
 <template name="listTickets" xmlns="http://ws.apache.org/ns/synapse">
-    <parameter name="filterType"
-               description="The type of the filter.Can be defaultfilters,requester,customticketviews,companyname,companyid,requesteremail."/>
-    <parameter name="filterName"
-               description="An available filter out of 'all_tickets, new_my_open, monitored_by, spam, deleted'."/>
+    <parameter name="predefinedFilters"
+               description="The various filters available are new_and_my_open, watching, spam, deleted."/>
     <parameter name="requesterId" description="The unique identifier of the requester."/>
-    <parameter name="viewId" description="The unique identifier ofthe view."/>
-    <parameter name="companyName" description="Name of the company."/>
+    <parameter name="updatedSince" description="The tickets updated since specific date."/>
     <parameter name="companyId" description="The unique identifier of the company."/>
     <parameter name="email" description="The email address."/>
     <parameter name="page" description="The requested page number."/>
-
+    <parameter name="orderBy" description="Tickets will be ordered by given values."/>
+    <parameter name="orderType" description="Sorting by ascending or descending."/>
+    <parameter name="include" description="Result will include specific information according to the value."/>
     <sequence>
-        <property name="uri.var.filterType" expression="$func:filterType"/>
-        <property name="uri.var.filterName" expression="$func:filterName"/>
+        <property name="uri.var.predefinedFilters" expression="$func:predefinedFilters"/>
         <property name="uri.var.requesterId" expression="$func:requesterId"/>
-        <property name="uri.var.viewId" expression="$func:viewId"/>
-        <property name="uri.var.companyName" expression="$func:companyName"/>
+        <property name="uri.var.updatedSince" expression="$func:updatedSince"/>
         <property name="uri.var.companyId" expression="$func:companyId"/>
         <property name="uri.var.email" expression="$func:email"/>
         <property name="uri.var.page" expression="$func:page"/>
-
-        <!--Construct endpoint with optional url parameters -->
-        <script language="js">
-            <![CDATA[
-      
-         var apiUrl=mc.getProperty("uri.var.apiUrl") + "/helpdesk/tickets";
-         var format=mc.getProperty("uri.var.format");
-         var query="";
-         var filterType = mc.getProperty("uri.var.filterType");
-         var filterName = mc.getProperty("uri.var.filterName");
-         var requesterId = mc.getProperty("uri.var.requesterId");
-         var viewId = mc.getProperty("uri.var.viewId");
-         var companyName = mc.getProperty("uri.var.companyName");
-         var companyId = mc.getProperty("uri.var.companyId");
-         var email = mc.getProperty("uri.var.email");
-         var page=mc.getProperty("uri.var.page");
-         
-         //If user provides a 'Default filter', then construct the endpoint "/helpdesk/tickets/filter/[filter_name]?format=json"		
-   
-         if (filterName != null && filterName != "" && filterType.toLowerCase() == "defaultfilters" ) {
-            query = "/filter/" + filterName + "?";
-         }
-         
-         //If user provides a 'Requester' filter, then construct the endpoint "/helpdesk/tickets/filter/requester/[requester_id]?format=json"
-         else if (filterType.toLowerCase() == "requester" ) {
-            query ="/filter/requester/"+ requesterId + "?";
-         
-            if (filterName != null && filterName != "") {
-              query += "filter_name=" + filterName +"&";
-            }
-         }
-         
-         //If user provides a 'Company name' filter, then construct the endpoint "/helpdesk/tickets.json?company_name=[name]&filter_name=all_tickets"
-         else if (companyName != null && companyName != "" &&  filterType.toLowerCase() == "companyname" ) {
-            query = "?company_name=" + companyName + "&";
-            
-            if (filterName != null && filterName != "") {
-              query += "filter_name=" + filterName +"&";
-            }
-         }
-
-         //If user provides a 'Company id' filter, then construct the endpoint "/helpdesk/tickets.json?company_id=[id]&filter_name=all_tickets"		
-         else if (companyId != null && companyId != "" && filterType.toLowerCase() == "companyid" ) {
-            query = "?company_id=" + companyId + "&";
-             
-            if (filterName != null && filterName != "") {
-              query += "filter_name=" + filterName +"&";
-            }
-         }
-
-         //If user provides a 'Requester email' filter, then construct the endpoint "/helpdesk/tickets.json?email=[email]&filter_name=all_tickets"		
-         else if (email != null && email != "" && filterType.toLowerCase() == "requesteremail" ) {
-            query = "?email=" + email + "&";
-            
-            if (filterName != null && filterName != "") {
-              query += "filter_name=" + filterName +"&";
-            }
-         }
-         
-         //If user provides a 'Custom ticket views' filter, then construct the endpoint "/helpdesk/tickets/view/[view_id]?format=json"
-         else if (filterType.toLowerCase() == "customticketviews" ) {
-            query = "/view/" + viewId + "?";
-         }
-         
-         //If the user did not provide any of the filters then construct the endpoint "helpdesk/tickets.json"
-         if (query == "") {
-            query = "?";
-         }
-   
-         if(page !=null && page !="") {
-            query += "page=" + page + "&";
-         }
-         
-         query += "format=" + format;
-         apiUrl+=query.substring(0);
-   
-         mc.setProperty('uri.var.apiUrl', apiUrl);
-
-      ]]>
-        </script>
-
-        <call>
-            <endpoint>
-                <http method="get" uri-template="{+uri.var.apiUrl}"/>
-            </endpoint>
-        </call>
-
+        <property name="uri.var.orderBy" expression="$func:orderBy"/>
+        <property name="uri.var.orderType" expression="$func:orderType"/>
+        <property name="uri.var.include" expression="$func:include"/>
+        <property name="uri.var.apiParameters" value=""/>
+        <filter xpath="(not($ctx:uri.var.predefinedFilters = '' or (not(string($ctx:uri.var.predefinedFilters)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'filter=', $ctx:uri.var.predefinedFilters, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.requesterId = '' or (not(string($ctx:uri.var.requesterId)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'requester_id=', $ctx:uri.var.requesterId, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.updatedSince = '' or (not(string($ctx:uri.var.updatedSince)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'updated_since=', $ctx:uri.var.updatedSince, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.companyId = '' or (not(string($ctx:uri.var.companyId)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'company_id=', $ctx:uri.var.companyId, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.email = '' or (not(string($ctx:uri.var.email)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'email=', $ctx:uri.var.email, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.page = '' or (not(string($ctx:uri.var.page)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'page=', $ctx:uri.var.page, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.orderBy = '' or (not(string($ctx:uri.var.orderBy)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'order_by=', $ctx:uri.var.orderBy, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.orderType = '' or (not(string($ctx:uri.var.orderType)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'order_type=', $ctx:uri.var.orderType, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.include = '' or (not(string($ctx:uri.var.include)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'include=', $ctx:uri.var.include, '&amp;')"/>
+            </then>
+        </filter>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="get" uri-template="{+uri.var.apiUrl}/api/v2/tickets?{+uri.var.apiParameters}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="get" uri-template="{+uri.var.apiUrl}/api/v2/tickets?{+uri.var.apiParameters}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
         <!-- Remove response custom header information -->
         <header name="X-Runtime" scope="transport" action="remove"/>
         <header name="X-Powered-By" scope="transport" action="remove"/>
-
     </sequence>
 </template>

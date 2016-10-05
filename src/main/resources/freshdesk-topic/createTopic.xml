@@ -18,51 +18,79 @@
 -->
 
 <template name="createTopic" xmlns="http://ws.apache.org/ns/synapse">
-    <parameter name="categoryId" description="The unique identifier of the category."/>
+    <!--Required Parameters-->
     <parameter name="forumId" description="The unique identifier of the forum."/>
-    <parameter name="title" description="The title of the topic."/>
-    <parameter name="bodyHtml" description="The description of the topic."/>
+    <parameter name="message" description="Message body of the topic."/>
+    <parameter name="title" description="Title of the topic."/>
+    <!--Supported Parameters-->
+    <parameter name="stampType" description="Stamp type given to the topic."/>
     <parameter name="sticky" description="Describes whether a topic can be deleted or not."/>
     <parameter name="locked" description="If true the forum is locked."/>
-
     <sequence>
-        <property name="uri.var.categoryId" expression="$func:categoryId"/>
         <property name="uri.var.forumId" expression="$func:forumId"/>
         <property name="uri.var.title" expression="$func:title"/>
-        <property name="uri.var.bodyHtml" expression="$func:bodyHtml"/>
+        <property name="uri.var.message" expression="$func:message"/>
+        <property name="uri.var.stampType" expression="$func:stampType"/>
         <property name="uri.var.sticky" expression="$func:sticky"/>
         <property name="uri.var.locked" expression="$func:locked"/>
-
         <payloadFactory media-type="json">
             <format>
                 {
-                "topic":{
                 "title":"$1",
-                "body_html":"$2",
-                "sticky":"$3",
-                "locked":"$4"
-                }
+                "message":"$2"
                 }
             </format>
             <args>
-                <arg expression="get-property('uri.var.title')"/>
-                <arg expression="get-property('uri.var.bodyHtml')"/>
-                <arg expression="get-property('uri.var.sticky')"/>
-                <arg expression="get-property('uri.var.locked')"/>
+                <arg expression="$ctx:uri.var.title"/>
+                <arg expression="$ctx:uri.var.message"/>
             </args>
         </payloadFactory>
-
-        <call>
-            <endpoint>
-                <http method="post"
-                      uri-template="{uri.var.apiUrl}/categories/{uri.var.categoryId}/forums/{uri.var.forumId}/topics.{uri.var.format}"/>
-            </endpoint>
-        </call>
-
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var stampType = mc.getProperty('uri.var.stampType');
+                var sticky =mc.getProperty('uri.var.sticky');
+                var locked =mc.getProperty('uri.var.locked');
+                //Get the existing payload
+                var payload = mc.getPayloadJSON();
+                if (stampType != null && stampType != "") {
+                   var stampTypeInt = parseInt(mc.getProperty("uri.var.stampType"));
+                   payload["stamp_type"]=stampTypeInt;
+                }
+                if (sticky != null && sticky != "") {
+                   var stickyBoolean =Boolean(mc.getProperty('uri.var.sticky'));
+                   payload["sticky"]=stickyBoolean;
+                }
+                if (locked != null && locked != "") {
+                   var lockedBoolean =Boolean(mc.getProperty('uri.var.locked'));
+                   payload["locked"]=lockedBoolean;
+                }
+                //Set the newly constructed payload
+                mc.setPayloadJSON(payload);
+            ]]>
+        </script>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="post"
+                              uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}/topics"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="post"
+                              uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}/topics"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
         <!-- Remove response custom header information -->
         <header name="X-Runtime" scope="transport" action="remove"/>
         <header name="X-Powered-By" scope="transport" action="remove"/>
         <header name="ETag" scope="transport" action="remove"/>
-
     </sequence>
 </template>

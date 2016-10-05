@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- ~
- ~  WSO2 Inc. licenses this file to you under the Apache License,
- ~  Version 2.0 (the "License"); you may not use this file except
- ~  in compliance with the License.
- ~  You may obtain a copy of the License at
- ~
- ~    http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~  Unless required by applicable law or agreed to in writing,
- ~  software distributed under the License is distributed on an
- ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~  KIND, either express or implied.  See the License for the
- ~  specific language governing permissions and limitations
- ~  under the License.
+Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+WSO2 Inc. licenses this file to you under the Apache License,
+Version 2.0 (the "License"); you may not use this file except
+in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
 -->
 
 <proxy xmlns="http://ws.apache.org/ns/synapse"
@@ -25,132 +25,336 @@
        startOnLoad="true">
     <target>
         <inSequence onError="faultHandlerSeq">
-            <property name="apiUrl" expression="json-eval($.apiUrl)"/>
-            <property name="apiKey" expression="json-eval($.apiKey)"/>
+            <property expression="json-eval($.apiUrl)" name="apiUrl"/>
+            <property expression="json-eval($.apiKey)" name="apiKey"/>
+            <property expression="json-eval($.description)" name="description"/>
+            <property expression="json-eval($.name)" name="name"/>
+            <property expression="json-eval($.domains)" name="domains"/>
+            <property expression="json-eval($.note)" name="note"/>
+            <property expression="json-eval($.customFields)" name="customFields"/>
+            <property name="companyId" expression="json-eval($.companyId)"/>
+            <property name="businessHourId" expression="json-eval($.businessHourId)"/>
+            <property name="bodyMessage" expression="json-eval($.bodyMessage)"/>
+            <property name="topicId" expression="json-eval($.topicId)"/>
+            <property name="commentId" expression="json-eval($.commentId)"/>
             <property name="email" expression="json-eval($.email)"/>
-            <property name="description" expression="json-eval($.description)"/>
-            <property name="status" expression="json-eval($.status)"/>
-            <property name="source" expression="json-eval($.source)"/>
-            <property name="id" expression="json-eval($.id)"/>
-            <property name="format" expression="json-eval($.format)"/>
-            <property name="letter" expression="json-eval($.letter)"/>
-            <property name="filterName" expression="json-eval($.filterName)"/>
-            <property name="companyName" expression="json-eval($.companyName)"/>
-            <property name="filterType" expression="json-eval($.filterType)"/>
-            <property name="subject" expression="json-eval($.subject)"/>
-            <property name="requesterId" expression="json-eval($.requesterId)"/>
-            <property name="ticketId" expression="json-eval($.ticketId)"/>
-            <property name="priority" expression="json-eval($.priority)"/>
-            <property name="userId" expression="json-eval($.userId)"/>
+            <property name="mobile" expression="json-eval($.mobile)"/>
+            <property name="phone" expression="json-eval($.phone)"/>
+            <property name="twitterId" expression="json-eval($.twitterId)"/>
+            <property name="otherEmails" expression="json-eval($.otherEmails)"/>
+            <property name="viewAllTickets" expression="json-eval($.viewAllTickets)"/>
+            <property name="address" expression="json-eval($.address)"/>
+            <property name="jobTitle" expression="json-eval($.jobTitle)"/>
+            <property name="language" expression="json-eval($.language)"/>
+            <property name="tags" expression="json-eval($.tags)"/>
+            <property name="timeZone" expression="json-eval($.timeZone)"/>
+            <property name="contactId" expression="json-eval($.contactId)"/>
             <property name="state" expression="json-eval($.state)"/>
-            <property name="format" expression="json-eval($.format)"/>
-            <property name="query" expression="json-eval($.query)"/>
             <property name="ticketId" expression="json-eval($.ticketId)"/>
-            <property name="noteBody" expression="json-eval($.noteBody)"/>
+            <property name="incoming" expression="json-eval($.incoming)"/>
+            <property name="notifyEmails" expression="json-eval($.notifyEmails)"/>
             <property name="private" expression="json-eval($.private)"/>
-            <property name="forumId" expression="json-eval($.forumId)"/>
+            <property name="userId" expression="json-eval($.userId)"/>
+            <property name="fromEmail" expression="json-eval($.fromEmail)"/>
+            <property name="ccEmails" expression="json-eval($.ccEmails)"/>
+            <property name="bccEmails" expression="json-eval($.bccEmails)"/>
             <property name="categoryId" expression="json-eval($.categoryId)"/>
+            <property name="forumType" expression="json-eval($.forumType)"/>
+            <property name="forumVisibility" expression="json-eval($.forumVisibility)"/>
+            <property name="companyIds" expression="json-eval($.companyIds)"/>
+            <property name="forumId" expression="json-eval($.forumId)"/>
+            <property name="forumCategoryId" expression="json-eval($.forumCategoryId)"/>
+            <property name="productId" expression="json-eval($.productId)"/>
+            <property name="applicableTo" expression="json-eval($.applicableTo)"/>
+            <property name="policyId" expression="json-eval($.policyId)"/>
+            <property name="requesterId" expression="json-eval($.requesterId)"/>
+            <property name="facebookId" expression="json-eval($.facebookId)"/>
+            <property name="subject" expression="json-eval($.subject)"/>
+            <property name="type" expression="json-eval($.type)"/>
+            <property name="status" expression="json-eval($.status)"/>
+            <property name="priority" expression="json-eval($.priority)"/>
+            <property name="responderId" expression="json-eval($.responderId)"/>
+            <property name="dueBy" expression="json-eval($.dueBy)"/>
+            <property name="emailConfigId" expression="json-eval($.emailConfigId)"/>
+            <property name="frDueBy" expression="json-eval($.frDueBy)"/>
+            <property name="groupId" expression="json-eval($.groupId)"/>
+            <property name="source" expression="json-eval($.source)"/>
+            <property name="tags" expression="json-eval($.tags)"/>
+            <property name="predefinedFilters" expression="json-eval($.predefinedFilters)"/>
+            <property name="updatedSince" expression="json-eval($.updatedSince)"/>
+            <property name="page" expression="json-eval($.page)"/>
+            <property name="orderBy" expression="json-eval($.orderBy)"/>
+            <property name="orderType" expression="json-eval($.orderType)"/>
+            <property name="include" expression="json-eval($.include)"/>
+            <property name="message" expression="json-eval($.message)"/>
             <property name="title" expression="json-eval($.title)"/>
-            <property name="bodyHtml" expression="json-eval($.bodyHtml)"/>
+            <property name="stampType" expression="json-eval($.stampType)"/>
             <property name="sticky" expression="json-eval($.sticky)"/>
             <property name="locked" expression="json-eval($.locked)"/>
             <property name="topicId" expression="json-eval($.topicId)"/>
-            <property name="postId" expression="json-eval($.postId)"/>
             <freshdesk.init>
                 <apiKey>{$ctx:apiKey}</apiKey>
                 <apiUrl>{$ctx:apiUrl}</apiUrl>
-                <format>{$ctx:format}</format>
             </freshdesk.init>
             <switch source="get-property('transport','Action')">
+                <case regex="urn:createCompany">
+                    <freshdesk.createCompany>
+                        <name>{$ctx:name}</name>
+                        <description>{$ctx:description}</description>
+                        <domains>{$ctx:domains}</domains>
+                        <note>{$ctx:note}</note>
+                        <customFields>{$ctx:customFields}</customFields>
+                    </freshdesk.createCompany>
+                </case>
+                <case regex="urn:getCompany">
+                    <freshdesk.getCompany>
+                        <companyId>{$ctx:companyId}</companyId>
+                    </freshdesk.getCompany>
+                </case>
+                <case regex="urn:deleteCompany">
+                    <freshdesk.deleteCompany>
+                        <companyId>{$ctx:companyId}</companyId>
+                    </freshdesk.deleteCompany>
+                </case>
+                <case regex="urn:listCompanies">
+                    <freshdesk.listCompanies/>
+                </case>
+                <case regex="urn:listCompanyFields">
+                    <freshdesk.listCompanyFields/>
+                </case>
+                <case regex="urn:updateCompany">
+                    <freshdesk.updateCompany>
+                        <companyId>{$ctx:companyId}</companyId>
+                        <name>{$ctx:name}</name>
+                        <description>{$ctx:description}</description>
+                        <domains>{$ctx:domains}</domains>
+                        <note>{$ctx:note}</note>
+                        <customFields>{$ctx:customFields}</customFields>
+                    </freshdesk.updateCompany>
+                </case>
+                <case regex="urn:getBusinessHour">
+                    <freshdesk.getBusinessHour>
+                        <businessHourId>{$ctx:businessHourId}</businessHourId>
+                    </freshdesk.getBusinessHour>
+                </case>
+                <case regex="urn:listBusinessHours">
+                    <freshdesk.listBusinessHours/>
+                </case>
+                <case regex="urn:createComment">
+                    <freshdesk.createComment>
+                        <bodyMessage>{$ctx:bodyMessage}</bodyMessage>
+                        <topicId>{$ctx:topicId}</topicId>
+                    </freshdesk.createComment>
+                </case>
+                <case regex="urn:deleteComment">
+                    <freshdesk.deleteComment>
+                        <commentId>{$ctx:commentId}</commentId>
+                    </freshdesk.deleteComment>
+                </case>
+                <case regex="urn:createContact">
+                    <freshdesk.createContact>
+                        <name>{$ctx:name}</name>
+                        <email>{$ctx:email}</email>
+                        <mobile>{$ctx:mobile}</mobile>
+                        <phone>{$ctx:phone}</phone>
+                        <twitterId>{$ctx:twitterId}</twitterId>
+                        <otherEmails>{$ctx:otherEmails}</otherEmails>
+                        <companyId>{$ctx:companyId}</companyId>
+                        <viewAllTickets>{$ctx:viewAllTickets}</viewAllTickets>
+                        <address>{$ctx:address}</address>
+                        <customFields>{$ctx:customFields}</customFields>
+                        <description>{$ctx:description}</description>
+                        <jobTitle>{$ctx:jobTitle}</jobTitle>
+                        <language>{$ctx:language}</language>
+                        <tags>{$ctx:tags}</tags>
+                        <timeZone>{$ctx:timeZone}</timeZone>
+                    </freshdesk.createContact>
+                </case>
+                <case regex="urn:getContact">
+                    <freshdesk.getContact>
+                        <contactId>{$ctx:contactId}</contactId>
+                    </freshdesk.getContact>
+                </case>
+                <case regex="urn:listContacts">
+                    <freshdesk.listContacts>
+                        <name>{$ctx:name}</name>
+                        <email>{$ctx:email}</email>
+                        <mobile>{$ctx:mobile}</mobile>
+                        <phone>{$ctx:phone}</phone>
+                        <companyId>{$ctx:companyId}</companyId>
+                        <state>{$ctx:state}</state>
+                    </freshdesk.listContacts>
+                </case>
+                <case regex="urn:createNote">
+                    <freshdesk.createNote>
+                        <bodyMessage>{$ctx:bodyMessage}</bodyMessage>
+                        <ticketId>{$ctx:ticketId}</ticketId>
+                        <incoming>{$ctx:incoming}</incoming>
+                        <notifyEmails>{$ctx:notifyEmails}</notifyEmails>
+                        <private>{$ctx:private}</private>
+                        <userId>{$ctx:userId}</userId>
+                    </freshdesk.createNote>
+                </case>
+                <case regex="urn:createReply">
+                    <freshdesk.createReply>
+                        <bodyMessage>{$ctx:bodyMessage}</bodyMessage>
+                        <ticketId>{$ctx:ticketId}</ticketId>
+                        <fromEmail>{$ctx:fromEmail}</fromEmail>
+                        <ccEmails>{$ctx:ccEmails}</ccEmails>
+                        <bccEmails>{$ctx:bccEmails}</bccEmails>
+                        <userId>{$ctx:userId}</userId>
+                    </freshdesk.createReply>
+                </case>
+                <case regex="urn:createForum">
+                    <freshdesk.createForum>
+                        <name>{$ctx:name}</name>
+                        <categoryId>{$ctx:categoryId}</categoryId>
+                        <forumType>{$ctx:forumType}</forumType>
+                        <forumVisibility>{$ctx:forumVisibility}</forumVisibility>
+                        <companyIds>{$ctx:companyIds}</companyIds>
+                        <description>{$ctx:description}</description>
+                    </freshdesk.createForum>
+                </case>
+                <case regex="urn:getForum">
+                    <freshdesk.getForum>
+                        <forumId>{$ctx:forumId}</forumId>
+                    </freshdesk.getForum>
+                </case>
+                <case regex="urn:updateForum">
+                    <freshdesk.updateForum>
+                        <forumId>{$ctx:forumId}</forumId>
+                        <name>{$ctx:name}</name>
+                        <forumCategoryId>{$ctx:forumCategoryId}</forumCategoryId>
+                        <forumType>{$ctx:forumType}</forumType>
+                        <forumVisibility>{$ctx:forumVisibility}</forumVisibility>
+                        <companyIds>{$ctx:companyIds}</companyIds>
+                        <description>{$ctx:description}</description>
+                    </freshdesk.updateForum>
+                </case>
+                <case regex="urn:getProduct">
+                    <freshdesk.getProduct>
+                        <productId>{$ctx:productId}</productId>
+                    </freshdesk.getProduct>
+                </case>
+                <case regex="urn:listProducts">
+                    <freshdesk.listProducts/>
+                </case>
+                <case regex="urn:listSLAPolicies">
+                    <freshdesk.listSLAPolicies/>
+                </case>
+                <case regex="urn:updateSLAPolicy">
+                    <freshdesk.updateSLAPolicy>
+                        <applicableTo>{$ctx:applicableTo}</applicableTo>
+                        <policyId>{$ctx:policyId}</policyId>
+                    </freshdesk.updateSLAPolicy>
+                </case>
                 <case regex="urn:createTicket">
                     <freshdesk.createTicket>
+                        <requesterId>{$ctx:requesterId}</requesterId>
                         <email>{$ctx:email}</email>
-                        <source>{$ctx:source}</source>
-                        <description>{$ctx:description}</description>
+                        <facebookId>{$ctx:facebookId}</facebookId>
+                        <phone>{$ctx:phone}</phone>
+                        <twitterId>{$ctx:twitterId}</twitterId>
+                        <name>{$ctx:name}</name>
+                        <subject>{$ctx:subject}</subject>
+                        <type>{$ctx:type}</type>
                         <status>{$ctx:status}</status>
+                        <priority>{$ctx:priority}</priority>
+                        <customFields>{$ctx:customFields}</customFields>
+                        <description>{$ctx:description}</description>
+                        <responderId>{$ctx:responderId}</responderId>
+                        <ccEmails>{$ctx:ccEmails}</ccEmails>
+                        <dueBy>{$ctx:dueBy}</dueBy>
+                        <emailConfigId>{$ctx:emailConfigId}</emailConfigId>
+                        <frDueBy>{$ctx:frDueBy}</frDueBy>
+                        <groupId>{$ctx:groupId}</groupId>
+                        <productId>{$ctx:productId}</productId>
+                        <source>{$ctx:source}</source>
+                        <tags>{$ctx:tags}</tags>
                     </freshdesk.createTicket>
+                </case>
+                <case regex="urn:deleteTicket">
+                    <freshdesk.deleteTicket>
+                        <ticketId>{$ctx:ticketId}</ticketId>
+                    </freshdesk.deleteTicket>
                 </case>
                 <case regex="urn:getTicket">
                     <freshdesk.getTicket>
-                        <id>{$ctx:id}</id>
+                        <ticketId>{$ctx:ticketId}</ticketId>
                     </freshdesk.getTicket>
                 </case>
-                <case regex="urn:listCustomers">
-                    <freshdesk.listCustomers>
-                        <letter>{$ctx:letter}</letter>
-                    </freshdesk.listCustomers>
+                <case regex="urn:listTicketFields">
+                    <freshdesk.listTicketFields/>
                 </case>
                 <case regex="urn:listTickets">
                     <freshdesk.listTickets>
-                        <filterName>{$ctx:filterName}</filterName>
-                        <companyName>{$ctx:companyName}</companyName>
-                        <filterType>{$ctx:filterType}</filterType>
+                        <predefinedFilters>{$ctx:predefinedFilters}</predefinedFilters>
+                        <requesterId>{$ctx:requesterId}</requesterId>
+                        <updatedSince>{$ctx:updatedSince}</updatedSince>
+                        <companyId>{$ctx:companyId}</companyId>
+                        <email>{$ctx:email}</email>
+                        <page>{$ctx:page}</page>
+                        <orderBy>{$ctx:orderBy}</orderBy>
+                        <orderType>{$ctx:orderType}</orderType>
+                        <include>{$ctx:include}</include>
                     </freshdesk.listTickets>
                 </case>
                 <case regex="urn:updateTicket">
                     <freshdesk.updateTicket>
-                        <subject>{$ctx:subject}</subject>
+                        <ticketId>{$ctx:ticketId}</ticketId>
                         <requesterId>{$ctx:requesterId}</requesterId>
-                        <ticketId>{$ctx:ticketId}</ticketId>
+                        <email>{$ctx:email}</email>
+                        <facebookId>{$ctx:facebookId}</facebookId>
+                        <phone>{$ctx:phone}</phone>
+                        <twitterId>{$ctx:twitterId}</twitterId>
+                        <name>{$ctx:name}</name>
+                        <subject>{$ctx:subject}</subject>
+                        <type>{$ctx:type}</type>
+                        <status>{$ctx:status}</status>
                         <priority>{$ctx:priority}</priority>
+                        <customFields>{$ctx:customFields}</customFields>
+                        <description>{$ctx:description}</description>
+                        <responderId>{$ctx:responderId}</responderId>
+                        <ccEmails>{$ctx:ccEmails}</ccEmails>
+                        <dueBy>{$ctx:dueBy}</dueBy>
+                        <emailConfigId>{$ctx:emailConfigId}</emailConfigId>
+                        <frDueBy>{$ctx:frDueBy}</frDueBy>
+                        <groupId>{$ctx:groupId}</groupId>
+                        <productId>{$ctx:productId}</productId>
+                        <source>{$ctx:source}</source>
+                        <tags>{$ctx:tags}</tags>
                     </freshdesk.updateTicket>
-                </case>
-                <case regex="urn:assignTicket">
-                    <freshdesk.assignTicket>
-                        <ticketId>{$ctx:ticketId}</ticketId>
-                        <userId>{$ctx:userId}</userId>
-                    </freshdesk.assignTicket>
-                </case>
-                <case regex="urn:listUsers">
-                    <freshdesk.listUsers>
-                        <query>{$ctx:query}</query>
-                        <state>{$ctx:state}</state>
-                    </freshdesk.listUsers>
-                </case>
-                <case regex="urn:addNote">
-                    <freshdesk.addNote>
-                        <noteBody>{$ctx:noteBody}</noteBody>
-                        <ticketId>{$ctx:ticketId}</ticketId>
-                        <private>{$ctx:private}</private>
-                    </freshdesk.addNote>
-                </case>
-                <case regex="urn:getUser">
-                    <freshdesk.getUser>
-                        <userId>{$ctx:userId}</userId>
-                    </freshdesk.getUser>
                 </case>
                 <case regex="urn:createTopic">
                     <freshdesk.createTopic>
                         <forumId>{$ctx:forumId}</forumId>
-                        <categoryId>{$ctx:categoryId}</categoryId>
+                        <message>{$ctx:message}</message>
                         <title>{$ctx:title}</title>
-                        <bodyHtml>{$ctx:bodyHtml}</bodyHtml>
+                        <stampType>{$ctx:stampType}</stampType>
                         <sticky>{$ctx:sticky}</sticky>
                         <locked>{$ctx:locked}</locked>
                     </freshdesk.createTopic>
                 </case>
-                <case regex="urn:createPost">
-                    <freshdesk.createPost>
+                <case regex="urn:deleteTopic">
+                    <freshdesk.deleteTopic>
                         <topicId>{$ctx:topicId}</topicId>
-                        <forumId>{$ctx:forumId}</forumId>
-                        <categoryId>{$ctx:categoryId}</categoryId>
-                        <bodyHtml>{$ctx:bodyHtml}</bodyHtml>
-                    </freshdesk.createPost>
-                </case>
-                <case regex="urn:deletePost">
-                    <freshdesk.deletePost>
-                        <topicId>{$ctx:topicId}</topicId>
-                        <forumId>{$ctx:forumId}</forumId>
-                        <categoryId>{$ctx:categoryId}</categoryId>
-                        <postId>{$ctx:postId}</postId>
-                    </freshdesk.deletePost>
+                    </freshdesk.deleteTopic>
                 </case>
                 <case regex="urn:getTopic">
                     <freshdesk.getTopic>
                         <topicId>{$ctx:topicId}</topicId>
-                        <categoryId>{$ctx:categoryId}</categoryId>
-                        <forumId>{$ctx:forumId}</forumId>
                     </freshdesk.getTopic>
+                </case>
+                <case regex="urn:updateTopic">
+                    <freshdesk.updateTopic>
+                        <topicId>{$ctx:topicId}</topicId>
+                        <forumId>{$ctx:forumId}</forumId>
+                        <message>{$ctx:message}</message>
+                        <title>{$ctx:title}</title>
+                        <stampType>{$ctx:stampType}</stampType>
+                        <sticky>{$ctx:sticky}</sticky>
+                        <locked>{$ctx:locked}</locked>
+                    </freshdesk.updateTopic>
                 </case>
             </switch>
             <respond/>

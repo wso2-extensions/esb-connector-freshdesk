@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+
+<template name="updateTopic" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters-->
+    <parameter name="topicId" description="The unique identifier of the topic."/>
+    <!--Supported Parameters-->
+    <parameter name="forumId" description="The unique identifier of the forum."/>
+    <parameter name="message" description="Message body of the topic."/>
+    <parameter name="title" description="Title of the topic."/>
+    <parameter name="stampType" description="Stamp type given to the topic."/>
+    <parameter name="sticky" description="Describes whether a topic can be deleted or not."/>
+    <parameter name="locked" description="If true the forum is locked."/>
+    <sequence>
+        <property name="uri.var.topicId" expression="$func:topicId"/>
+        <property name="uri.var.forumId" expression="$func:forumId"/>
+        <property name="uri.var.title" expression="$func:title"/>
+        <property name="uri.var.message" expression="$func:message"/>
+        <property name="uri.var.stampType" expression="$func:stampType"/>
+        <property name="uri.var.sticky" expression="$func:sticky"/>
+        <property name="uri.var.locked" expression="$func:locked"/>
+        <payloadFactory media-type="json">
+            <format>
+            </format>
+        </payloadFactory>
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var forumId = mc.getProperty('uri.var.forumId');
+                var title = mc.getProperty('uri.var.title');
+                var message = mc.getProperty('uri.var.message');
+                var stampType = mc.getProperty('uri.var.stampType');
+                var sticky = mc.getProperty('uri.var.sticky');
+                var locked = mc.getProperty('uri.var.locked');
+                //Get the existing payload
+                var payload = mc.getPayloadJSON();
+                if (forumId != null && forumId != "") {
+                var forumIdInt = parseInt(mc.getProperty('uri.var.forumId'));
+                   payload["forum_id"]=forumIdInt;
+                }
+                if (title != null && title != "") {
+                   payload["title"]=title;
+                }
+                if (message != null && message != "") {
+                   payload["message"]=message;
+                }
+                if (stampType != null && stampType != "") {
+                var stampTypeInt = parseInt(mc.getProperty('uri.var.stampType'));
+                   payload["stamp_type"]=stampTypeInt;
+                }
+                if (sticky != null && sticky != "") {
+                   var stickyBoolean = Boolean(mc.getProperty('uri.var.sticky'));
+                   payload["sticky"]=stickyBoolean;
+                }
+                if (locked != null && locked != "") {
+                   var lockedBoolean =Boolean(mc.getProperty('uri.var.locked'));
+                   payload["locked"]=lockedBoolean;
+                }
+                //Set the newly constructed payload
+                mc.setPayloadJSON(payload);
+            ]]>
+        </script>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="put"
+                              uri-template="{uri.var.apiUrl}/api/v2/discussions/topics/{uri.var.topicId}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="put"
+                              uri-template="{uri.var.apiUrl}/api/v2/discussions/topics/{uri.var.topicId}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+        <header name="ETag" scope="transport" action="remove"/>
+    </sequence>
+</template>

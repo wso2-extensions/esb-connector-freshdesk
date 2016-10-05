@@ -1,0 +1,11 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "applicableTo": {
+    "company_ids": [
+      19000007803,
+      19000037831
+    ]
+  },
+  "policyId": "19000008183"
+}

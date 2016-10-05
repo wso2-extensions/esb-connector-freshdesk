@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+
+<template name="updateSLAPolicy" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters-->
+    <parameter name="applicableTo"
+               description="Key Value pair of the object and the array of object IDs denoting the conditions based on which the SLA policy is to be applied"/>
+    <parameter name="policyId"
+               description="Unique value of SLA Policy."/>
+    <sequence>
+        <property name="uri.var.applicableTo" expression="$func:applicableTo"/>
+        <property name="uri.var.policyId" expression="$func:policyId"/>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var applicableTo = mc.getProperty('uri.var.applicableTo');
+                var query='{';
+                if (applicableTo != null && applicableTo != "" && applicableTo!="{}") {
+                    var applicableToArray=eval( "('" + applicableTo + "')" );
+                    query = query.concat('"applicable_to":' + applicableToArray +',');
+                }
+                query=query.substring(0, query.length-1);
+                mc.setProperty('uri.var.query', query);
+            ]]>
+        </script>
+        <payloadFactory media-type="json">
+            <format>
+                $1}
+            </format>
+            <args>
+                <arg expression="$ctx:uri.var.query"/>
+            </args>
+        </payloadFactory>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/sla_policies/{uri.var.policyId}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="put" uri-template="{uri.var.apiUrl}/api/v2/sla_policies/{uri.var.policyId}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+    </sequence>
+</template>

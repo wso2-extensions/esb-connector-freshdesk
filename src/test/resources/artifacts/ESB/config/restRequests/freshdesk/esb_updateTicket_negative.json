@@ -1,7 +1,23 @@
 {
-	"apiUrl":"%s(apiUrl)",
-	"apiKey":"%s(apiKey)",
-	"format":"json",
-	"ticketId":"%s(ticketId)",
-	"requesterId":"INVALID_ID_123456"
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "ticketId": "negative",
+  "requesterId": "",
+  "email": "",
+  "facebookId": "",
+  "phone": "",
+  "twitterId": "",
+  "name": "",
+  "subject": "",
+  "description": "",
+  "emailConfigId": "",
+  "frDueBy": "",
+  "groupId": "",
+  "productId": "",
+  "source": "",
+  "type": "",
+  "responderId": "",
+  "dueBy": "",
+  "priority": "1",
+  "status": "2"
 }

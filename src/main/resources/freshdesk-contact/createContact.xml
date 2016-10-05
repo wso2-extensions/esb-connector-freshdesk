@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+
+<template name="createContact" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters-->
+    <parameter name="name" description="Name of the contact."/>
+    <!--Supported Parameters-->
+    <parameter name="email" description="Email address of the contact."/>
+    <parameter name="mobile" description="Mobile number of the contact. "/>
+    <parameter name="phone" description="Telephone number of the requester."/>
+    <parameter name="twitterId" description="Twitter ID of the requester."/>
+    <parameter name="otherEmails" description="Additional emails associated with the contact."/>
+    <parameter name="companyId" description="ID of the company to which this contact belongs."/>
+    <parameter name="viewAllTickets"
+               description="Set to true if the contact can see all the tickets that are associated with the company."/>
+    <parameter name="address" description="Address of the contact."/>
+    <parameter name="customFields" description="Key value pairs containing the names and values of custom fields."/>
+    <parameter name="description" description="A small description of the contact."/>
+    <parameter name="jobTitle" description="Job title of the contact."/>
+    <parameter name="language" description="Language of the contact. Default language is en."/>
+    <parameter name="tags" description="Tags associated with this contact."/>
+    <parameter name="timeZone" description="Time zone of the contact. Default value is the time zone of the domain."/>
+    <sequence>
+        <property name="uri.var.name" expression="$func:name"/>
+        <property name="uri.var.email" expression="$func:email"/>
+        <property name="uri.var.mobile" expression="$func:mobile"/>
+        <property name="uri.var.phone" expression="$func:phone"/>
+        <property name="uri.var.twitterId" expression="$func:twitterId"/>
+        <property name="uri.var.otherEmails" expression="$func:otherEmails"/>
+        <property name="uri.var.companyId" expression="$func:companyId"/>
+        <property name="uri.var.viewAllTickets" expression="$func:viewAllTickets"/>
+        <property name="uri.var.address" expression="$func:address"/>
+        <property name="uri.var.customFields" expression="$func:customFields"/>
+        <property name="uri.var.description" expression="$func:description"/>
+        <property name="uri.var.jobTitle" expression="$func:jobTitle"/>
+        <property name="uri.var.language" expression="$func:language"/>
+        <property name="uri.var.tags" expression="$func:tags"/>
+        <property name="uri.var.timeZone" expression="$func:timeZone"/>
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var name = mc.getProperty('uri.var.name');
+                var email = mc.getProperty('uri.var.email');
+                var mobile = mc.getProperty('uri.var.mobile');
+                var phone = mc.getProperty('uri.var.phone');
+                var twitterId = mc.getProperty('uri.var.twitterId');
+                var viewAllTickets = mc.getProperty('uri.var.viewAllTickets');
+                var address = mc.getProperty('uri.var.address');
+                var otherEmails = mc.getProperty('uri.var.otherEmails');
+                var companyId = mc.getProperty('uri.var.companyId');
+                var description = mc.getProperty('uri.var.description');
+                var jobTitle = mc.getProperty('uri.var.jobTitle');
+                var language = mc.getProperty('uri.var.language');
+                var tags = mc.getProperty('uri.var.tags');
+                var timeZone = mc.getProperty('uri.var.timeZone');
+                var customFields = mc.getProperty('uri.var.customFields');
+                var query='{';
+                if (name != null && name != ""){
+                    query = query.concat('"'+'name":"' + name+'",');
+                }
+                if (email != null && email != ""){
+                    query = query.concat('"'+'email":"' + email+'",');
+                }
+                if (mobile != null && mobile != ""){
+                    query = query.concat('"'+'mobile":"' + mobile+'",');
+                }
+                if (phone != null && phone != ""){
+                    query = query.concat('"'+'phone":"' + phone+'",');
+                }
+                if (twitterId != null && twitterId != ""){
+                    query = query.concat('"'+'twitter_id":"' + twitterId+'",');
+                }
+                if (address != null && address != "") {
+                    query = query.concat('"'+'address":"' + address+'",');
+                }
+                if (companyId != null && companyId != "") {
+                    query = query.concat('"'+'company_id":' + companyId+',');
+                }
+                if (jobTitle != null && jobTitle != "") {
+                    query = query.concat('"'+'job_title":"' + jobTitle+'",');
+                }
+                if (language != null && language != "") {
+                    query = query.concat('"'+'language":"' + language+'",');
+                }
+                if (tags != null && tags != "" && tags!="[]") {
+                    var tagsArray=eval( "('" + tags + "')" );
+                    query = query.concat('"tags":' + tagsArray +',');
+                }
+                if (timeZone != null && timeZone != "") {
+                    query = query.concat('"'+'time_zone":"' + timeZone+'",');
+                }
+                if (description != null && description != "") {
+                    query = query.concat('"'+'description":"' + description+'",');
+                }
+                if (otherEmails != null && otherEmails != "" && otherEmails!="[]") {
+                    var otherEmailsArray=eval( "('" + otherEmails + "')" );
+                    query = query.concat('"other_emails":' + otherEmailsArray +',');
+                }
+                if (viewAllTickets != null && viewAllTickets != "") {
+                   query = query.concat('"'+'view_all_tickets":' + viewAllTickets+',');
+                }
+                if (customFields != null && customFields != "" && customFields!="{}") {
+                    var customFieldsArray=eval( "('" + customFields + "')" );
+                    query = query.concat('"custom_fields":' + customFieldsArray +',');
+                }
+                query=query.substring(0, query.length-1);
+                mc.setProperty('uri.var.query', query);
+            ]]>
+        </script>
+        <payloadFactory media-type="json">
+            <format>
+                $1}
+            </format>
+            <args>
+                <arg expression="$ctx:uri.var.query"/>
+            </args>
+        </payloadFactory>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/contacts"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/contacts"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+    </sequence>
+</template>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+
+<template name="updateForum" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters-->
+    <parameter name="forumId" description="The unique identifier of the Forum."/>
+    <!--Supported Parameters-->
+    <parameter name="name" description="Name of the forum."/>
+    <parameter name="forumCategoryId" description="ID of the category to which this forum belongs."/>
+    <parameter name="forumType" description="Denotes the type of forum."/>
+    <parameter name="forumVisibility" description="Denotes the visibility level of the forum."/>
+    <parameter name="companyIds" description="This property is an array of those company IDs."/>
+    <parameter name="description" description="Description of the forum."/>
+    <sequence>
+        <property name="uri.var.forumId" expression="$func:forumId"/>
+        <property name="uri.var.name" expression="$func:name"/>
+        <property name="uri.var.forumCategoryId" expression="$func:forumCategoryId"/>
+        <property name="uri.var.forumType" expression="$func:forumType"/>
+        <property name="uri.var.forumVisibility" expression="$func:forumVisibility"/>
+        <property name="uri.var.companyIds" expression="$func:companyIds"/>
+        <property name="uri.var.description" expression="$func:description"/>
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var name = mc.getProperty('uri.var.name');
+                var forumCategoryId = mc.getProperty('uri.var.forumCategoryId');
+                var forumType = mc.getProperty('uri.var.forumType');
+                var forumVisibility = mc.getProperty('uri.var.forumVisibility');
+                var companyIds = mc.getProperty('uri.var.companyIds');
+                var description = mc.getProperty('uri.var.description');
+                var query='{';
+                if (name != null && name != ""){
+                    query = query.concat('"'+'name":"' + name+'",');
+                }
+                if (companyIds != null && companyIds != "" && companyIds!="[]") {
+                    var companyIdsArray=eval( "('" + companyIds + "')" );
+                    query = query.concat('"company_ids":' + companyIdsArray +',');
+                }
+                if (forumCategoryId != null && forumCategoryId != "") {
+                    query = query.concat('"'+'forum_category_id":' + forumCategoryId+',');
+                }
+                if (forumType != null && forumType != "") {
+                    query = query.concat('"'+'forum_type":' + forumType+',');
+                }
+                if (forumVisibility != null && forumVisibility != "") {
+                    query = query.concat('"'+'forum_visibility":' + forumVisibility+',');
+                }
+                if (description != null && description != ""){
+                    query = query.concat('"'+'description":"' + description+'",');
+                }
+                query=query.substring(0, query.length-1);
+                mc.setProperty('uri.var.query', query);
+            ]]>
+        </script>
+        <payloadFactory media-type="json">
+            <format>
+                $1}
+            </format>
+            <args>
+                <arg expression="$ctx:uri.var.query"/>
+            </args>
+        </payloadFactory>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="put"
+                              uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="put"
+                              uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+        <header name="ETag" scope="transport" action="remove"/>
+    </sequence>
+</template>

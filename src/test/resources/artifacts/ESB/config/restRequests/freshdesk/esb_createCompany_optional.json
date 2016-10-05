@@ -1,0 +1,12 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "name": "testOptional",
+  "description": "testing",
+  "note": "companyNote",
+  "domains": [
+    "test2domain",
+    "test3domain"
+  ],
+  "customFields": "%s(customFields)"
+}

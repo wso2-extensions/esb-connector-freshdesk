@@ -18,168 +18,169 @@
 -->
 
 <template name="createTicket" xmlns="http://ws.apache.org/ns/synapse">
-    <parameter name="description" description="Plain text content of the ticket."/>
-    <parameter name="descriptionHtml"
-               description="HTML content of the ticket. Description and description_html should not be passed together."/>
-    <parameter name="subject" description="The Ticket subject."/>
-    <parameter name="email"
-               description="The Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact."/>
-    <parameter name="status" description="The Status of the ticket."/>
-    <parameter name="priority" description="The Priority of the ticket."/>
-    <parameter name="source" description="The The channel through which the ticket was created."/>
-    <parameter name="deleted" description="The Deleted status of the Ticket."/>
-    <parameter name="requesterId"
-               description="User-id of the requester. For existing contacts, requester_id can be passed instead of email."/>
-    <parameter name="requesterName" description="The requesterId"/>
-    <parameter name="responderId" description="ID of the agent to whom the ticket is assigned."/>
-    <parameter name="groupId" description="Id of Group to which the ticket is assigned."/>
-    <parameter name="ticketType" description="Type property field as defined in ticket fields."/>
-    <parameter name="toEmails" description="Email address to which the incoming ticket email was sent."/>
-    <parameter name="ccEmails" description="Email address added in the 'cc' field of the incoming ticket email."/>
-    <parameter name="emailConfigId" description="The Id of email config which is used for this ticket."/>
-    <parameter name="isEscalated" description="Set to true if an escalation was sent."/>
-    <parameter name="customField" description="Pre defined Custom fields as a JSON Object."/>
-    <parameter name="trained" description="Ttrained status as true or false."/>
-    <parameter name="frEscalated" description="frEscalated status as true or false."/>
-    <parameter name="delta" description="Delta as true or false."/>
-    <parameter name="urgent" description="Urgent status as true or false."/>
-    <parameter name="ownerId" description="The Owner Id."/>
-
+    <!--Required Parameters-->
+    <parameter name="requesterId" description="User ID of the requester."/>
+    <parameter name="email" description="Email address of the requester."/>
+    <parameter name="facebookId" description="Facebook ID of the requester. "/>
+    <parameter name="phone" description="Phone number of the requester."/>
+    <parameter name="twitterId" description="Twitter handle of the requester."/>
+    <!--Supported Parameters-->
+    <parameter name="name" description="Name of the requester."/>
+    <parameter name="subject" description="Subject of the ticket."/>
+    <parameter name="type"
+               description="Helps categorize the ticket according to the different kinds of issues your support team deals with."/>
+    <parameter name="status" description="Status of the ticket."/>
+    <parameter name="priority" description="Priority of the ticket."/>
+    <parameter name="description" description="HTML content of the ticket."/>
+    <parameter name="responderId" description="ID of the agent to whom the ticket has been assigned."/>
+    <parameter name="ccEmails"
+               description="Email address added in the 'cc' field of the incoming ticket email."/>
+    <parameter name="customFields" description="Key value pairs containing the names and values of custom fields."/>
+    <parameter name="dueBy" description="Timestamp that denotes when the ticket is due to be resolved."/>
+    <parameter name="emailConfigId" description="ID of email config which is used for this ticket."/>
+    <parameter name="frDueBy" description="Timestamp that denotes when the first response is due."/>
+    <parameter name="groupId" description="ID of the group to which the ticket has been assigned."/>
+    <parameter name="productId" description="ID of the product to which the ticket is associated."/>
+    <parameter name="source" description="The channel through which the ticket was created."/>
+    <parameter name="tags" description="Tags that have been associated with the ticket."/>
     <sequence>
-        <property name="uri.var.description" expression="$func:description"/>
-        <property name="uri.var.descriptionHtml" expression="$func:descriptionHtml"/>
-        <property name="uri.var.subject" expression="$func:subject"/>
+        <property name="uri.var.requesterId" expression="$func:requesterId"/>
         <property name="uri.var.email" expression="$func:email"/>
+        <property name="uri.var.facebookId" expression="$func:facebookId"/>
+        <property name="uri.var.phone" expression="$func:phone"/>
+        <property name="uri.var.twitterId" expression="$func:twitterId"/>
+        <property name="uri.var.name" expression="$func:name"/>
+        <property name="uri.var.subject" expression="$func:subject"/>
+        <property name="uri.var.type" expression="$func:type"/>
         <property name="uri.var.status" expression="$func:status"/>
         <property name="uri.var.priority" expression="$func:priority"/>
-        <property name="uri.var.source" expression="$func:source"/>
-        <property name="uri.var.deleted" expression="$func:deleted"/>
-        <property name="uri.var.requesterId" expression="$func:requesterId"/>
-        <property name="uri.var.requesterName" expression="$func:requesterName"/>
+        <property name="uri.var.description" expression="$func:description"/>
         <property name="uri.var.responderId" expression="$func:responderId"/>
-        <property name="uri.var.groupId" expression="$func:groupId"/>
-        <property name="uri.var.ticketType" expression="$func:ticketType"/>
-        <property name="uri.var.toEmails" expression="$func:toEmails"/>
         <property name="uri.var.ccEmails" expression="$func:ccEmails"/>
+        <property name="uri.var.customFields" expression="$func:customFields"/>
+        <property name="uri.var.dueBy" expression="$func:dueBy"/>
         <property name="uri.var.emailConfigId" expression="$func:emailConfigId"/>
-        <property name="uri.var.isEscalated" expression="$func:isEscalated"/>
-        <property name="uri.var.customField" expression="$func:customField"/>
-        <property name="uri.var.trained" expression="$func:trained"/>
-        <property name="uri.var.frEscalated" expression="$func:frEscalated"/>
-        <property name="uri.var.delta" expression="$func:delta"/>
-        <property name="uri.var.urgent" expression="$func:urgent"/>
-        <property name="uri.var.ownerId" expression="$func:ownerId"/>
-
-        <payloadFactory media-type="json">
-            <format>
-                {
-                "helpdesk_ticket":{
-                "email":"$1",
-                "description":"$2",
-                "subject":"$3",
-                "requester_id":"$4",
-                "status":"$5",
-                "priority":"$6",
-                "requester_name":"$7",
-                "responder_id":"$8",
-                "group_id":"$9",
-                "ticket_type":"$10",
-                "email_config_id":"$11"
-                },
-                "cc_emails":"$12"
-                }
-            </format>
-            <args>
-                <arg expression="get-property('uri.var.email')"/>
-                <arg expression="get-property('uri.var.description')"/>
-                <arg expression="get-property('uri.var.subject')"/>
-                <arg expression="get-property('uri.var.requesterId')"/>
-                <arg expression="get-property('uri.var.status')"/>
-                <arg expression="get-property('uri.var.priority')"/>
-                <arg expression="get-property('uri.var.requesterName')"/>
-                <arg expression="get-property('uri.var.responderId')"/>
-                <arg expression="get-property('uri.var.groupId')"/>
-                <arg expression="get-property('uri.var.ticketType')"/>
-                <arg expression="get-property('uri.var.emailConfigId')"/>
-                <arg expression="get-property('uri.var.ccEmails')"/>
-            </args>
-        </payloadFactory>
-
-        <!-- Constructing payload with optional parameters -->
+        <property name="uri.var.frDueBy" expression="$func:frDueBy"/>
+        <property name="uri.var.groupId" expression="$func:groupId"/>
+        <property name="uri.var.productId" expression="$func:productId"/>
+        <property name="uri.var.source" expression="$func:source"/>
+        <property name="uri.var.tags" expression="$func:tags"/>
+        <property name="uri.var.query" value=''/>
         <script language="js">
             <![CDATA[
-         payload = mc.getPayloadJSON();
-         
-         var descriptionHtml = mc.getProperty("uri.var.descriptionHtml");
-         var customField = mc.getProperty("uri.var.customField");
-         var trained = mc.getProperty("uri.var.trained");
-         
-         var delta = mc.getProperty("uri.var.delta");
-         var urgent = mc.getProperty("uri.var.urgent");
-         var ownerId = mc.getProperty("uri.var.ownerId");
-         var source = mc.getProperty("uri.var.source");
-         var deleted = mc.getProperty("uri.var.deleted");
-         var frEscalated = mc.getProperty("uri.var.frEscalated");
-         var isEscalated = mc.getProperty("uri.var.isEscalated");
-         var toEmails = mc.getProperty("uri.var.toEmails");
-         
-         if (descriptionHtml != null && descriptionHtml != ""){
-            payload.helpdesk_ticket.description_html = descriptionHtml;
-         }
-         
-         if (customField != null && customField != ""){
-            payload.helpdesk_ticket.custom_field = eval("("+customField+")");
-         }
-         
-         if (trained != null && trained != ""){
-            payload.helpdesk_ticket.trained = trained;
-         }
-         
-         if (delta != null && delta != ""){
-            payload.helpdesk_ticket.delta = delta;
-         }
-         
-         if (urgent != null && urgent != ""){
-            payload.helpdesk_ticket.urgent = urgent;
-         }
-         
-         if (ownerId != null && ownerId != ""){
-            payload.helpdesk_ticket.owner_id = ownerId;
-         }
-         
-         if (source != null && source != ""){
-            payload.helpdesk_ticket.source = source;
-         }
-         
-         if (deleted != null && deleted != ""){
-            payload.helpdesk_ticket.deleted = deleted;
-         }
-         
-         if (frEscalated != null && frEscalated != ""){
-            payload.helpdesk_ticket.fr_escalated = frEscalated;
-         }
-         
-         if (isEscalated != null && isEscalated != ""){
-            payload.helpdesk_ticket.isescalated = isEscalated;
-         }
-         
-         if (toEmails != null && toEmails != ""){
-            payload.helpdesk_ticket.to_emails = toEmails;
-         }
-         
-         mc.setPayloadJSON(payload);
-         ]]>
+                //request body param variables
+                var email = mc.getProperty('uri.var.email');
+                var facebookId = mc.getProperty("uri.var.facebookId");
+                var requesterId = mc.getProperty('uri.var.requesterId');
+                var description = mc.getProperty('uri.var.description');
+                var subject = mc.getProperty('uri.var.subject');
+                var priority = mc.getProperty('uri.var.priority');
+                var status = mc.getProperty('uri.var.status');
+                var phone = mc.getProperty("uri.var.phone");
+                var twitterId = mc.getProperty("uri.var.twitterId");
+                var name = mc.getProperty("uri.var.name");
+                var ccEmails = mc.getProperty("uri.var.ccEmails");
+                var customFields = mc.getProperty("uri.var.customFields");
+                var dueBy = mc.getProperty("uri.var.dueBy");
+                var emailConfigId = mc.getProperty("uri.var.emailConfigId");
+                var frDueBy = mc.getProperty("uri.var.frDueBy");
+                var groupId = mc.getProperty("uri.var.groupId");
+                var productId = mc.getProperty("uri.var.productId");
+                var source =mc.getProperty("uri.var.source");
+                var tags = mc.getProperty("uri.var.tags");
+                var query='{';
+                //query = query.concat(email);
+                if (email != null && email != ""){
+                    query = query.concat('"'+'email":"' + email+'",');
+                }
+                if (description != null && description != ""){
+                    query = query.concat('"'+'description":"' + description+'",');
+                }
+                if (subject != null && subject != ""){
+                    query = query.concat('"'+'subject":"' + subject+'",');
+                }
+                if (status != null && status != ""){
+                    query = query.concat('"'+'status":' + status+',');
+                }
+                if (priority != null && priority != ""){
+                    query = query.concat('"'+'priority":' + priority+',');
+                }
+                if (requesterId != null && requesterId != ""){
+                    query = query.concat('"'+'requester_id":' + requesterId+',');
+                }
+                if (facebookId != null && facebookId != ""){
+                    query = query.concat('"'+'facebook_id":"' + facebookId+'",');
+                }
+                if (twitterId != null && twitterId != ""){
+                    query = query.concat('"'+'twitter_id":"' + twitterId+'",');
+                }
+                if (phone != null && phone != ""){
+                    query = query.concat('"'+'phone":"' + phone+'",');
+                }
+                if (name != null && name != ""){
+                    query = query.concat('"'+'name":"' + name+'",');
+                }
+                if (dueBy != null && dueBy != ""){
+                    query = query.concat('"'+'due_by":"' + dueBy+'",');
+                }
+                if (frDueBy != null && frDueBy != ""){
+                    query = query.concat('"'+'fr_due_by":"' + frDueBy+'",');
+                }
+                if (tags != null && tags != ""){
+                    query = query.concat('"'+'tags":"' + tags+'"}');
+                }
+                if (emailConfigId != null && emailConfigId != ""){
+                    query = query.concat('"'+'email_config_id":' + emailConfigId+',');
+                }
+                if (groupId != null && groupId != ""){
+                    query = query.concat('"'+'group_id":' + groupId+',');
+                }
+                if (productId != null && productId != ""){
+                    query = query.concat('"'+'product_id":' + productId+',');
+                }
+                if (source != null && source != ""){
+                    query = query.concat('"'+'source":' + source+',');
+                }
+                if (ccEmails != null && ccEmails != "" && ccEmails!="[]") {
+                    var ccEmailsArray=eval( "('" + ccEmails + "')" );
+                    query = query.concat('"cc_emails":' + ccEmailsArray +',');
+                }
+                if (customFields != null && customFields != "" && customFields!="{}") {
+                    var customFieldsArray=eval( "('" + customFields + "')" );
+                    query = query.concat('"custom_fields":' + customFieldsArray +',');
+                }
+                query=query.substring(0, query.length-1);
+                mc.setProperty('uri.var.query', query);
+
+            ]]>
         </script>
-
-        <call>
-            <endpoint>
-                <http method="post" uri-template="{uri.var.apiUrl}/helpdesk/tickets.{uri.var.format}"/>
-            </endpoint>
-        </call>
-
+        <payloadFactory media-type="json">
+            <format>
+                $1}
+            </format>
+            <args>
+                <arg expression="$ctx:uri.var.query"/>
+            </args>
+        </payloadFactory>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/tickets"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/tickets"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
         <!-- Remove response custom header information -->
         <header name="X-Runtime" scope="transport" action="remove"/>
         <header name="X-Powered-By" scope="transport" action="remove"/>
-
     </sequence>
 </template>

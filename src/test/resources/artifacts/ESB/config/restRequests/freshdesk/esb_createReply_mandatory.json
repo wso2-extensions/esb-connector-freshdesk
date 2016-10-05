@@ -1,0 +1,6 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "bodyMessage": "%s(bodyMessage)",
+  "ticketId": "%s(ticketId)"
+}

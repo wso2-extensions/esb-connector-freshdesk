@@ -1,6 +1,9 @@
 {
-	"apiUrl":"%s(apiUrl)",
-	"apiKey":"%s(apiKey)",
-	"format":"json",
-	"email":"%s(email)"
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "email": "tom@outerspace.com",
+  "description": "%s(description)",
+  "subject": "%s(subject)",
+  "priority": "%s(priority)",
+  "status": "%s(status)"
 }

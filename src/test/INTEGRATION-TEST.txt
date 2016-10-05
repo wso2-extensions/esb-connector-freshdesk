@@ -11,23 +11,15 @@ Product: Integration tests for WSO2 ESB Fresh Desk connector
 
     - Microsoft WINDOWS V-7
     - Ubuntu 13.04
-    - WSO2 ESB 4.9.0
+    - WSO2 ESB 5.0.0
  
 Steps to follow in setting integration test.
- 1.  Download ESB 4.9.0 from official website.
+ 1.  Download ESB 5.0.0 from official website.
  2.  Deploy relevant patches, if applicable.
 
 STEPS:
 
-01) Please make sure that the below mentioned Axis configurations are enabled (/repository/conf/axis2/axis2.xml). 
-
-   <messageFormatter contentType="text/html"                             
-                     class="org.wso2.carbon.relay.ExpandingMessageFormatter"/>
-
-   <messageBuilder contentType="text/html"                                
-                     class="org.wso2.carbon.relay.BinaryRelayBuilder"/>
-
-02) Follow the below mentioned steps to create a new FreshDesk account:
+01) Follow the below mentioned steps to create a new FreshDesk account:
 
     i)   Navigate to the following url and create a fresh account in Freshdesk: http://freshdesk.com/signup
          (Provide the following: Name, Email (should be valid), Company, Domain - <preferred name>.freshdesk.com and phone no)
@@ -35,41 +27,81 @@ STEPS:
          (You will be automatically taken to a link where you'll be asked to provide a password. Provide one and keep it for further use)
     iii) Login to the API. Follow: https://<domain>.freshdesk.com/support/login
     iv)  Once you've logged in: Click on your profile picture on the top right corner of your portal -> Go to Profile settings Page -> Your API key will be available below the change password section to your right. Save it for further use.
-    v)   In your account dashboard: Go to Customers -> Companies and Create a new company (The company name should not contain any spaces in between). Save the Company name for further use.
-    vi)  In the company create a new contact by providing values for the required fields: Full Name, Email and Phone No.
-    vii) Go to Admin -> Security, and disable 'Secure Connection using SSL'.
+    v) Create a new category by providing values for the required fields: Name.. by going https://wso2yasho.freshdesk.com/admin/business_calendars/new and click on the New Cateory button.
+    vi) Create a new BusinessHour by providing values for the required fields: Name.. by going https://<domain>.freshdesk.com/discussions/categories and click on the New Business Hour button.
+    vii) Create a new Product by providing values for the required fields: Product Name.. by going https://<domain>.freshdesk.com/admin/products and click on the New Product button.
+    viii) Create a new Policy by providing values for the required fields: Name.. by going https://<domain>.freshdesk.com/helpdesk/sla_policies and click on the New SLA Policy button.
+    ix) Create a new group by providing values for the required fields: Name, Description.. by going https://<domain>.freshdesk.com/groups and click on the New Group Policy button.
+    x) Go to Admin -> Security, and disable 'Secure Connection using SSL'.
 
 03)	Follow the below mentioned steps to add valid certificate to access Freshdesk API over https.
 
-    i) Extract the certificate from browser by navigating to 'https://<domain>.freshdesk.com' and place the certificate file in following location. Domain is the name used in Step 02)-(i)
-       "{FRESHDESK_HOME}/src/test/resources/keystores/products/"
-	  
-    ii) Navigate to "{FRESHDESK_HOME}/src/test/resources/keystores/products/" using command prompt and execute keytool -importcert -file CERT_FILE_NAME -keystore wso2carbon.jks -alias "CERT_NAME" in command line to import freshdesk certificate in to keystore. Give "wso2carbon" as password.
-        NOTE : CERT_FILE_NAME is the certificate file name which was extracted from freshdesk.
-               CERT_NAME is name of the certificate. (e.g. freshdesk)
+  	 i)   Extract the certificate from browser(Mozilla Firefox) by navigating to https://<domain>.freshdesk.com
+   	ii)  Go to new ESB 5.0.0 folder and place the downloaded certificate in both "<ESB_HOME>/repository/resources/security/" and "{FRESHDESK_CONNECTOR_HOME}/src/test/resources/keystores/products/" folders.
+   	iii) Navigate to "<ESB_HOME>/repository/resources/security/" using command prompt and execute keytool -importcert -file CERT_FILE_NAME -keystore client-truststore.jks -alias "CERT_NAME" in command line to import freshdesk certificate in to keystore.
+   		 Give "wso2carbon" as password. Press "Y" to complete certificate import process.
+
+   		 NOTE : CERT_FILE_NAME is the file name which was extracted from freshdesk. (e.g. DigiCertSHA2HighAssuranceServerCA.crt)
+   			    CERT_NAME is an arbitrary name for the certificate. (e.g. freshdesk)
+
+   	iv)  Navigate to "{FRESHDESK_CONNECTOR_HOME}/src/test/resources/keystores/products/" using command prompt and execute keytool -importcert -file CERT_FILE_NAME -keystore wso2carbon.jks -alias "CERT_NAME" in command line to import Shopify certificate in to keystore.
+   		Give "wso2carbon" as password.
+
+   		NOTE : CERT_FILE_NAME is the file name which was extracted from freshdesk, change it accordingly. (e.g. DigiCertSHA2HighAssuranceServerCA.crt)
+   			   CERT_NAME is an arbitrary name for the certificate. (e.g. freshdesk)
+
 			   
-04) Compress modified ESB as wso2esb-4.9.0.zip and copy that zip file in to location "{FRESHDESK_HOME}/repository/".
+04) Compress modified ESB as wso2esb-5.0.0.zip and copy that zip file in to location "{FRESHDESK_HOME}/repository/".
 	
 05)	Update the property file freshdesk.properties found in {FRESHDESK_HOME}/src/test/resources/artifacts/ESB/connector/config as follows:
 	
-    i)     apiUrl             -  API endpoint to which the service calls are made. e.g. https://virtusaabc.freshdesk.com
+    i)     apiUrl             -  API endpoint to which the service calls are made. e.g. https://wso2yasho.freshdesk.com
     ii)    apiKey             -  Use the API key obtained in Step 02)-(iv)
     iii)   email              -  Use any well formatted email (exampleName@exampleDomain.com) that currently doesn't exist as a customer email. 
-    iv)    ticketDescription  -  Any valid String to be used as description when creating a ticket.
+    iv)    description        -  Any valid String to be used as description when creating.
     v)     source             -  An integer value between 1 and 7  indicating the source through which the ticket is created. Refer http://freshdesk.com/api#ticket
     vi)    priority           -  An integer value between 1 and 4 indicating the priority level of the ticket. Refer http://freshdesk.com/api#ticket
     vii)   status             -  An integer value between 1 and 4 indicating the status of the ticket. Refer http://freshdesk.com/api#ticket
-    viii)  letter             -  Use the name of the company created in Step 02)-(v)
-    ix)    filterType         -  Type of the filter to be used. Use 'companyname'.
-    x)     companyName        -  Use the name of the company created in Step 02)-(v) (filterType would be set to 'companyname')
-    xi)    filterName         -  Use all_tickets to get the all the tickets.
-    xii)   subject            -  Any String value that can be used to update the subject of the ticket with.
-    xiii)  userEmail          -  Use the email that was used to register with Freshdesk Step 02)-(i)
-    xiv)   state              -  State of the users to be listed. Use 'all' to list all the users. Refer http://freshdesk.com/api#view_all_user
-    xv)    noteBody           -  Any valid text to be added to the new note.
-    xvi)   private            -  Indicate whether or not the note should be privet/public. Use false.
-    xvii)  forumId            -  An existing forum id in the current account.
+    viii)  name		      -	 Any valid String to be used as name when creating.
+    ix)    contactName        -  Any valid String to be used as name when creating.
+    x)     companyName        -  Any valid String to be used as name when creating. It has to be unique
+    xi)    businessHourId     -  An existing business hour id in the current account.
+    xii)   subject            -  Any String value that can be used as the subject of the ticket.
+    xiii)  productId	      -  An existing product id in the current account.
+    xiv)   policyId   	      -  An existing policy id in the current account.
+    xv)    bodyMessage        -  Any valid text to be added to the new note/reply/comment.
+    xvi)   predefinedFilter   -  The various filters available are new_and_my_open, watching, spam, deleted.
+    xvii)  orderType  	      -  Default sort order type is desc
     xviii) categoryId         -  An existing category id in the current account.
+    xix)   phone              -  Any valid phone number
+    xx)    twitterId          -  Unique Twitter Id
+    xxi)   address            -  Any valid String to be used as address when creating. 
+    xxii)  mobile	      -  Any valid mobile number
+    xxiii) jobTitle	      - Any valid String to be used as job title when creating.
+    xxiv)  language           - Language of the contact. Default language is "en". 
+    xxv)   tags		      - Array of Strings
+    xxvi)  companyIds	      - Array of company Ids which you already created.
+    xxvii) ccEmails           - Array of Valid email addresses.
+    xxviii)userId	      - Id of the contact which you already created.
+    xxix)  requesterId        - Id of the existing Contact
+    xxx)   facebookId         - A valid facebook Id
+    xxxi)  type		      - Name of ticket Type
+    xxxii) ticketName         - Any valid String to be used as name when creating.
+    xxxiii)dueBy	      - Vaild Date Time Value. Greater than creating time.
+    xxxiv) emailConfigId      - Id of the existing Contact.
+    xxxv)  frDueBy            - Vaild Date Time Value. Greater than creating time.
+    xxxvi) groupId            - An existing group id in the current account.
+    xxxvii)message	      - Any valid String to be used as message when creating.
+    xxxviii)title	      - Any valid String to be used as title when creating.
+    xxxix)  sticky	      - A valid Boolean value
+    xl)     locked	      - A valid Boolean value
+    xli)    include	      - Can be stats or requester
+    xlii)   forumType         - An integer value between 1 and 4  indicating the type through which the forum is created. Refer http://developers.freshdesk.com/api/#forum_attributes
+    xliii)  forumVisibility   - An integer value between 1 and 4  indicating the visibility through which the forum is created. Refer http://developers.freshdesk.com/api/#forum_attributes
+    liv)    forumName	      - Any valid String to be used as name when creating. It should be unique.
+    lv)     otherEmails       - Valid Email addresses. It has to be unique.
+    lvi)    companyIds        - Array of Company Ids which you are already created in step 2
+    lvii)   customFields      - You can create custom fields by following "https://support.freshdesk.com/support/solutions/articles/216553"
 06) Navigate to "{FRESHDESK_HOME}" and run the following command.
       $ mvn clean install
 	  

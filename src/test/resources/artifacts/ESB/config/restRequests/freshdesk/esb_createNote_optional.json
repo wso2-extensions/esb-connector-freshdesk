@@ -1,0 +1,13 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "bodyMessage": "%s(bodyMessage)",
+  "ticketId": "%s(ticketId)",
+  "incoming": "true",
+  "notifyEmails": [
+    "abc@ddd.com",
+    "def@ddd.com"
+  ],
+  "private": "true",
+  "userId": "19000104481"
+}

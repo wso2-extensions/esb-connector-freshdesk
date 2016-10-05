@@ -1,0 +1,20 @@
+{
+  "apiUrl": "https://wso2yasho.freshdesk.com",
+  "apiKey": "SODsQllHr0NicsiRpRWw",
+  "name": "testContact",
+  "email": "testoptional@gmail.com",
+  "mobile": "%s(mobile)",
+  "phone": "%s(phone)",
+  "otherEmails": "%s(otherEmails)",
+  "companyId": "19000037831",
+  "viewAllTickets": "true",
+  "address": "%s(address)",
+  "description": "%s(description)",
+  "jobTitle": "%s(jobTitle)",
+  "language": "",
+  "tags": "",
+  "timeZone": "",
+  "customFields": {
+    "y": "test"
+  }
+}
