@@ -51,17 +51,17 @@
                 var payload = mc.getPayloadJSON();
                 if (forumId != null && forumId != "") {
                 var forumIdInt = parseInt(mc.getProperty('uri.var.forumId'));
-                   payload["forum_id"]=forumIdInt;
+                   payload["forum_id"] = forumIdInt;
                 }
                 if (title != null && title != "") {
-                   payload["title"]=title;
+                   payload["title"] = title;
                 }
                 if (message != null && message != "") {
-                   payload["message"]=message;
+                   payload["message"] = message;
                 }
                 if (stampType != null && stampType != "") {
                 var stampTypeInt = parseInt(mc.getProperty('uri.var.stampType'));
-                   payload["stamp_type"]=stampTypeInt;
+                   payload["stamp_type"] = stampTypeInt;
                 }
                 if (sticky != null && sticky != "") {
                    var stickyBoolean = Boolean(mc.getProperty('uri.var.sticky'));
@@ -69,7 +69,7 @@
                 }
                 if (locked != null && locked != "") {
                    var lockedBoolean =Boolean(mc.getProperty('uri.var.locked'));
-                   payload["locked"]=lockedBoolean;
+                   payload["locked"] = lockedBoolean;
                 }
                 //Set the newly constructed payload
                 mc.setPayloadJSON(payload);
@@ -81,7 +81,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="put"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/topics/{uri.var.topicId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/topics/{uri.var.topicId}"/>
                     </endpoint>
                 </call>
             </then>
@@ -89,7 +89,7 @@
                 <call>
                     <endpoint>
                         <http method="put"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/topics/{uri.var.topicId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/topics/{uri.var.topicId}"/>
                     </endpoint>
                 </call>
             </else>

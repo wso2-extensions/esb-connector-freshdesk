@@ -1,6 +1,7 @@
 {
   "apiUrl": "%s(apiUrl)",
   "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
   "name": "testOptional",
   "description": "testing",
   "note": "companyNote",

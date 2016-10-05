@@ -19,20 +19,20 @@
 <template name="getProduct" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="productId" description="The unique identifier of the Product."/>
     <sequence>
-        <property name="uri.var.productId" expression="$func:productId"/>
         <property name="messageType" value="application/json" scope="axis2"/>
+        <property name="uri.var.productId" expression="$func:productId"/>
         <filter source="$ctx:freshdeskBlocking" regex="true">
             <then>
                 <call blocking="true">
                     <endpoint>
-                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/products/{uri.var.productId}"/>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/products/{uri.var.productId}"/>
                     </endpoint>
                 </call>
             </then>
             <else>
                 <call>
                     <endpoint>
-                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/products/{uri.var.productId}"/>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/products/{uri.var.productId}"/>
                     </endpoint>
                 </call>
             </else>

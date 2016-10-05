@@ -29,12 +29,12 @@
             <![CDATA[
                 //request body param variables
                 var applicableTo = mc.getProperty('uri.var.applicableTo');
-                var query='{';
+                var query = '{';
                 if (applicableTo != null && applicableTo != "" && applicableTo!="{}") {
-                    var applicableToArray=eval( "('" + applicableTo + "')" );
+                    var applicableToArray = eval( "('" + applicableTo + "')" );
                     query = query.concat('"applicable_to":' + applicableToArray +',');
                 }
-                query=query.substring(0, query.length-1);
+                query = query.substring(0, query.length-1);
                 mc.setProperty('uri.var.query', query);
             ]]>
         </script>
@@ -51,14 +51,14 @@
             <then>
                 <call blocking="true">
                     <endpoint>
-                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/sla_policies/{uri.var.policyId}"/>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/sla_policies/{uri.var.policyId}"/>
                     </endpoint>
                 </call>
             </then>
             <else>
                 <call>
                     <endpoint>
-                        <http method="put" uri-template="{uri.var.apiUrl}/api/v2/sla_policies/{uri.var.policyId}"/>
+                        <http method="put" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/sla_policies/{uri.var.policyId}"/>
                     </endpoint>
                 </call>
             </else>

@@ -27,7 +27,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="delete"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/comments/{uri.var.commentId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/comments/{uri.var.commentId}"/>
                     </endpoint>
                 </call>
             </then>
@@ -35,7 +35,7 @@
                 <call>
                     <endpoint>
                         <http method="delete"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/comments/{uri.var.commentId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/comments/{uri.var.commentId}"/>
                     </endpoint>
                 </call>
             </else>

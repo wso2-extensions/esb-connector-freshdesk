@@ -19,10 +19,12 @@
 <template name="init" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="apiUrl" description="The url to access the Fresh Desk API."/>
     <parameter name="apiKey" description="The api token of the account."/>
+    <parameter name="apiVersion" description="The version of the Fresh Desk API"/>
     <parameter name="blocking" description="Set to true to perform the blocking invocations to FreshDesk."/>
     <sequence>
         <property name="uri.var.apiUrl" expression="$func:apiUrl"/>
         <property name="uri.var.apiKey" expression="$func:apiKey"/>
+        <property name="uri.var.apiVersion" expression="$func:apiVersion"/>
         <property name="freshdeskBlocking" expression="$func:blocking"/>
         <!-- Required Headers -->
         <property name="Authorization"

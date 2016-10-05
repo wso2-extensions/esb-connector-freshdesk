@@ -1,6 +1,7 @@
 {
   "apiUrl": "%s(apiUrl)",
   "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
   "companyId": "%s(companyId)",
   "name": "updateTest",
   "description": "Testing Optional"

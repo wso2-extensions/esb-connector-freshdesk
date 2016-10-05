@@ -19,20 +19,20 @@
 <template name="getForum" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="forumId" description="The unique identifier of the Forum."/>
     <sequence>
-        <property name="uri.var.forumId" expression="$func:forumId"/>
         <property name="messageType" value="application/json" scope="axis2"/>
+        <property name="uri.var.forumId" expression="$func:forumId"/>
         <filter source="$ctx:freshdeskBlocking" regex="true">
             <then>
                 <call blocking="true">
                     <endpoint>
-                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}"/>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/forums/{uri.var.forumId}"/>
                     </endpoint>
                 </call>
             </then>
             <else>
                 <call>
                     <endpoint>
-                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}"/>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/forums/{uri.var.forumId}"/>
                     </endpoint>
                 </call>
             </else>

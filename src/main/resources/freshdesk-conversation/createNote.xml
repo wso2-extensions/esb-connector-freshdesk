@@ -42,12 +42,12 @@
                 var notifyEmails = mc.getProperty('uri.var.notifyEmails');
                 var private = mc.getProperty('uri.var.private');
                 var userId = mc.getProperty('uri.var.userId');
-                var query='{';
+                var query = '{';
                 if (bodyMessage != null && bodyMessage != "") {
                    query = query.concat('"'+'body":"' + bodyMessage+'",');
                 }
                 if (notifyEmails != null && notifyEmails != "" && notifyEmails!="[]") {
-                    var notifyEmailsArray=eval( "('" + notifyEmails + "')" );
+                    var notifyEmailsArray = eval( "('" + notifyEmails + "')" );
                     query = query.concat('"notify_emails":' + notifyEmailsArray +',');
                 }
                 if (incoming != null && incoming != "") {
@@ -59,7 +59,7 @@
                 if (userId != null && userId != "") {
                     query = query.concat('"'+'user_id":' + userId+',');
                 }
-                query=query.substring(0, query.length-1);
+                query = query.substring(0, query.length-1);
                 mc.setProperty('uri.var.query', query);
             ]]>
         </script>
@@ -76,7 +76,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/tickets/{+uri.var.ticketId}/notes"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{+uri.var.ticketId}/notes"/>
                     </endpoint>
                 </call>
             </then>
@@ -84,7 +84,7 @@
                 <call>
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/tickets/{+uri.var.ticketId}/notes"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{+uri.var.ticketId}/notes"/>
                     </endpoint>
                 </call>
             </else>

@@ -27,6 +27,7 @@ under the License.
         <inSequence onError="faultHandlerSeq">
             <property expression="json-eval($.apiUrl)" name="apiUrl"/>
             <property expression="json-eval($.apiKey)" name="apiKey"/>
+            <property expression="json-eval($.apiVersion)" name="apiVersion"/>
             <property expression="json-eval($.description)" name="description"/>
             <property expression="json-eval($.name)" name="name"/>
             <property expression="json-eval($.domains)" name="domains"/>
@@ -95,6 +96,7 @@ under the License.
             <freshdesk.init>
                 <apiKey>{$ctx:apiKey}</apiKey>
                 <apiUrl>{$ctx:apiUrl}</apiUrl>
+                <apiVersion>{$ctx:apiVersion}</apiVersion>
             </freshdesk.init>
             <switch source="get-property('transport','Action')">
                 <case regex="urn:createCompany">

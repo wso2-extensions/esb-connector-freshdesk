@@ -26,7 +26,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="get"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/topics/{uri.var.topicId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/topics/{uri.var.topicId}"/>
                     </endpoint>
                 </call>
             </then>
@@ -34,7 +34,7 @@
                 <call>
                     <endpoint>
                         <http method="get"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/topics/{uri.var.topicId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/topics/{uri.var.topicId}"/>
                     </endpoint>
                 </call>
             </else>

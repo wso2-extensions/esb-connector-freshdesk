@@ -1,5 +1,6 @@
 {
   "apiUrl": "%s(apiUrl)",
   "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
   "productId": "%s(productId)"
 }

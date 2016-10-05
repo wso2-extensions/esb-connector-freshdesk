@@ -54,15 +54,15 @@
                 var payload = mc.getPayloadJSON();
                 if (stampType != null && stampType != "") {
                    var stampTypeInt = parseInt(mc.getProperty("uri.var.stampType"));
-                   payload["stamp_type"]=stampTypeInt;
+                   payload["stamp_type"] = stampTypeInt;
                 }
                 if (sticky != null && sticky != "") {
-                   var stickyBoolean =Boolean(mc.getProperty('uri.var.sticky'));
-                   payload["sticky"]=stickyBoolean;
+                   var stickyBoolean = Boolean(mc.getProperty('uri.var.sticky'));
+                   payload["sticky"] = stickyBoolean;
                 }
                 if (locked != null && locked != "") {
-                   var lockedBoolean =Boolean(mc.getProperty('uri.var.locked'));
-                   payload["locked"]=lockedBoolean;
+                   var lockedBoolean = Boolean(mc.getProperty('uri.var.locked'));
+                   payload["locked"] = lockedBoolean;
                 }
                 //Set the newly constructed payload
                 mc.setPayloadJSON(payload);
@@ -74,7 +74,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}/topics"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/forums/{uri.var.forumId}/topics"/>
                     </endpoint>
                 </call>
             </then>
@@ -82,7 +82,7 @@
                 <call>
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/forums/{uri.var.forumId}/topics"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/forums/{uri.var.forumId}/topics"/>
                     </endpoint>
                 </call>
             </else>

@@ -25,14 +25,14 @@
             <then>
                 <call blocking="true">
                     <endpoint>
-                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{uri.var.ticketId}"/>
                     </endpoint>
                 </call>
             </then>
             <else>
                 <call>
                     <endpoint>
-                        <http method="get" uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{uri.var.ticketId}"/>
                     </endpoint>
                 </call>
             </else>

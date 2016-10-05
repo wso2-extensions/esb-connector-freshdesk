@@ -50,17 +50,17 @@
                 //Get the existing payload
                 var payload = mc.getPayloadJSON();
                 if (description != null && description != "") {
-                   payload["description"]=description;
+                   payload["description"] = description;
                 }
                 if (domains != null && domains != "" && domains!="[]") {
-                    payload["domains"]=eval( "(" + domains + ")" );
+                    payload["domains"] = eval( "(" + domains + ")" );
                  }
                 if (note != null && note != "") {
-                   payload["note"]=note;
+                   payload["note"] = note;
                 }
                 if (customFields != null && customFields != "" && customFields!="{}") {
                     if(customFields.charCodeAt(0) == '123' ) {
-                        payload["custom_fields"]=eval( "(" + customFields + ")" );
+                        payload["custom_fields"] = eval( "(" + customFields + ")" );
                     }
                  }
                 //Set the newly constructed payload
@@ -73,7 +73,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/companies"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/companies"/>
                     </endpoint>
                 </call>
             </then>
@@ -81,7 +81,7 @@
                 <call>
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/companies"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/companies"/>
                     </endpoint>
                 </call>
             </else>

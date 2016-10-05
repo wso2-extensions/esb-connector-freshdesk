@@ -1,6 +1,7 @@
 {
   "apiUrl": "%s(apiUrl)",
   "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
   "name": "",
   "forumType": 2,
   "categoryId": 19000010655,

@@ -27,7 +27,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="delete"
-                              uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{uri.var.ticketId}"/>
                     </endpoint>
                 </call>
             </then>
@@ -35,7 +35,7 @@
                 <call>
                     <endpoint>
                         <http method="delete"
-                              uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{uri.var.ticketId}"/>
                     </endpoint>
                 </call>
             </else>

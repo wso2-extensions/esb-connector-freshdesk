@@ -1,6 +1,7 @@
 {
   "apiUrl": "%s(apiUrl)",
   "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
   "bodyMessage": "%s(bodyMessage)",
   "ticketId": "%s(ticketId)",
   "incoming": "true",

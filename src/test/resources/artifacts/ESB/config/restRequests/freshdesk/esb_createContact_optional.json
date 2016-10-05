@@ -1,6 +1,7 @@
 {
   "apiUrl": "https://wso2yasho.freshdesk.com",
   "apiKey": "SODsQllHr0NicsiRpRWw",
+  "apiVersion": "%s(apiVersion)",
   "name": "testContact",
   "email": "testoptional@gmail.com",
   "mobile": "%s(mobile)",

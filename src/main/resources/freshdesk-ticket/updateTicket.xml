@@ -88,7 +88,7 @@
                 var productId = mc.getProperty('uri.var.productId');
                 var source =mc.getProperty('uri.var.source');
                 var tags = mc.getProperty('uri.var.tags');
-                var query='{';
+                var query = '{';
                 //query = query.concat(email);
                 if (email != null && email != ""){
                     query = query.concat('"'+'email":"' + email+'",');
@@ -142,14 +142,14 @@
                     query = query.concat('"'+'source":' + source+',');
                 }
                 if (ccEmails != null && ccEmails != "" && ccEmails!="[]") {
-                    var ccEmailsArray=eval( "('" + ccEmails + "')" );
+                    var ccEmailsArray = eval( "('" + ccEmails + "')" );
                     query = query.concat('"cc_emails":' + ccEmailsArray +',');
                 }
                 if (customFields != null && customFields != "" && customFields!="{}") {
-                    var customFieldsArray=eval( "('" + customFields + "')" );
+                    var customFieldsArray = eval( "('" + customFields + "')" );
                     query = query.concat('"custom_fields":' + customFieldsArray +',');
                 }
-                query=query.substring(0, query.length-1);
+                query = query.substring(0, query.length-1);
                 mc.setProperty('uri.var.query', query);
             ]]>
         </script>
@@ -166,14 +166,14 @@
             <then>
                 <call blocking="true">
                     <endpoint>
-                        <http method="put" uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                        <http method="put" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{uri.var.ticketId}"/>
                     </endpoint>
                 </call>
             </then>
             <else>
                 <call>
                     <endpoint>
-                        <http method="put" uri-template="{uri.var.apiUrl}/api/v2/tickets/{uri.var.ticketId}"/>
+                        <http method="put" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{uri.var.ticketId}"/>
                     </endpoint>
                 </call>
             </else>

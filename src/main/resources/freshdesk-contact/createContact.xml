@@ -69,7 +69,7 @@
                 var tags = mc.getProperty('uri.var.tags');
                 var timeZone = mc.getProperty('uri.var.timeZone');
                 var customFields = mc.getProperty('uri.var.customFields');
-                var query='{';
+                var query = '{';
                 if (name != null && name != ""){
                     query = query.concat('"'+'name":"' + name+'",');
                 }
@@ -98,7 +98,7 @@
                     query = query.concat('"'+'language":"' + language+'",');
                 }
                 if (tags != null && tags != "" && tags!="[]") {
-                    var tagsArray=eval( "('" + tags + "')" );
+                    var tagsArray = eval( "('" + tags + "')" );
                     query = query.concat('"tags":' + tagsArray +',');
                 }
                 if (timeZone != null && timeZone != "") {
@@ -108,17 +108,17 @@
                     query = query.concat('"'+'description":"' + description+'",');
                 }
                 if (otherEmails != null && otherEmails != "" && otherEmails!="[]") {
-                    var otherEmailsArray=eval( "('" + otherEmails + "')" );
+                    var otherEmailsArray = eval( "('" + otherEmails + "')" );
                     query = query.concat('"other_emails":' + otherEmailsArray +',');
                 }
                 if (viewAllTickets != null && viewAllTickets != "") {
                    query = query.concat('"'+'view_all_tickets":' + viewAllTickets+',');
                 }
                 if (customFields != null && customFields != "" && customFields!="{}") {
-                    var customFieldsArray=eval( "('" + customFields + "')" );
+                    var customFieldsArray = eval( "('" + customFields + "')" );
                     query = query.concat('"custom_fields":' + customFieldsArray +',');
                 }
-                query=query.substring(0, query.length-1);
+                query = query.substring(0, query.length-1);
                 mc.setProperty('uri.var.query', query);
             ]]>
         </script>
@@ -135,14 +135,14 @@
             <then>
                 <call blocking="true">
                     <endpoint>
-                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/contacts"/>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/contacts"/>
                     </endpoint>
                 </call>
             </then>
             <else>
                 <call>
                     <endpoint>
-                        <http method="post" uri-template="{uri.var.apiUrl}/api/v2/contacts"/>
+                        <http method="post" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/contacts"/>
                     </endpoint>
                 </call>
             </else>

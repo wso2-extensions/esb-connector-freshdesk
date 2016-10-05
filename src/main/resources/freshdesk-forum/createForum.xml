@@ -40,12 +40,12 @@
                 var forumVisibility = mc.getProperty('uri.var.forumVisibility');
                 var companyIds = mc.getProperty('uri.var.companyIds');
                 var description = mc.getProperty('uri.var.description');
-                var query='{';
+                var query = '{';
                 if (name != null && name != ""){
                     query = query.concat('"'+'name":"' + name+'",');
                 }
                 if (companyIds != null && companyIds != "" && companyIds!="[]") {
-                    var companyIdsArray=eval( "('" + companyIds + "')" );
+                    var companyIdsArray = eval( "('" + companyIds + "')" );
                     query = query.concat('"company_ids":' + companyIdsArray +',');
                 }
                 if (forumType != null && forumType != "") {
@@ -57,7 +57,7 @@
                 if (description != null && description != ""){
                     query = query.concat('"'+'description":"' + description+'",');
                 }
-                query=query.substring(0, query.length-1);
+                query = query.substring(0, query.length-1);
                 mc.setProperty('uri.var.query', query);
             ]]>
         </script>
@@ -75,7 +75,7 @@
                 <call blocking="true">
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/categories/{uri.var.categoryId}/forums"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/categories/{uri.var.categoryId}/forums"/>
                     </endpoint>
                 </call>
             </then>
@@ -83,7 +83,7 @@
                 <call>
                     <endpoint>
                         <http method="post"
-                              uri-template="{uri.var.apiUrl}/api/v2/discussions/categories/{uri.var.categoryId}/forums"/>
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/discussions/categories/{uri.var.categoryId}/forums"/>
                     </endpoint>
                 </call>
             </else>
