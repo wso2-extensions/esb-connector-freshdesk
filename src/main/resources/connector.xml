@@ -30,7 +30,7 @@
         <dependency component="freshdesk-forum"/>
         <dependency component="freshdesk-product"/>
         <dependency component="freshdesk-slapolicies"/>
-        <description>freshdesk connector library</description>
+        <description>WSO2 connector library for Freshdesk</description>
         <icon>icon/icon-small.gif</icon>
     </component>
 </connector>

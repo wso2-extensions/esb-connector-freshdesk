@@ -48,14 +48,14 @@
                 var customFields = mc.getProperty('uri.var.customFields');
                 //Get the existing payload
                 var payload = mc.getPayloadJSON();
-                 if (description != null && description != "") {
+                if (description != null && description != "") {
                    payload["description"] = description;
                 }
                 if (name != null && name != "") {
                    payload["name"] = name;
                 }
                 if (domains != null && domains != "" && domains!="{}") {
-                payload.domains = eval( "(" + domains + ")" );
+                    payload.domains = eval( "(" + domains + ")" );
                  }
                 if (note != null && note != "") {
                    payload["note"] = note;
