@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="getProduct" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="productId" description="The unique identifier of the Product."/>
     <sequence>

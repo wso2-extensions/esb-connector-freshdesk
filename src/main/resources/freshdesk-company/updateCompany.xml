@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="updateCompany" xmlns="http://ws.apache.org/ns/synapse">
     <!--Required Parameters-->
     <parameter name="companyId" description="The unique identifier of a company."/>
@@ -26,7 +25,6 @@
     <parameter name="domains" description="Domains of the company."/>
     <parameter name="note" description="Any specific note about the company."/>
     <parameter name="customFields" description="Key value pairs containing the names and values of custom fields."/>
-
     <sequence>
         <property name="uri.var.companyId" expression="$func:companyId"/>
         <property name="uri.var.name" expression="$func:name"/>
@@ -37,7 +35,6 @@
         <payloadFactory media-type="json">
             <format>
                 {
-
                 }
             </format>
         </payloadFactory>

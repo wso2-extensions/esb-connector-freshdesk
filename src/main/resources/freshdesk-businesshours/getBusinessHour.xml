@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="getBusinessHour" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="businessHourId" description="The unique identifier of the BusinessHour."/>
     <sequence>

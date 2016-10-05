@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="listContacts" xmlns="http://ws.apache.org/ns/synapse">
     <!--Supported Parameters-->
     <parameter name="email" description="Email address of the contact."/>

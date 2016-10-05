@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="deleteCompany" xmlns="http://ws.apache.org/ns/synapse">
     <!--Required Parameter-->
     <parameter name="companyId" description="The unique identifier of a company."/>

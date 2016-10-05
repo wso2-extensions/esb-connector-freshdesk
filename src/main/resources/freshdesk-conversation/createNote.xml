@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="createNote" xmlns="http://ws.apache.org/ns/synapse">
     <!--Required Parameters-->
     <parameter name="bodyMessage" description="Content of the note in HTML."/>

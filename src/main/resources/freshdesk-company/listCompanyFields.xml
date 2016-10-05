@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="listCompanyFields" xmlns="http://ws.apache.org/ns/synapse">
     <sequence>
         <property name="messageType" value="application/json" scope="axis2"/>

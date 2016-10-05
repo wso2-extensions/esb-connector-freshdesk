@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <component name="freshdesk-comment" type="synapse/template">
     <subComponents>
         <component name="createComment">

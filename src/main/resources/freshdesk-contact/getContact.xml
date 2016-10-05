@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="getContact" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="contactId" description="The unique identifier of the contact."/>
     <sequence>

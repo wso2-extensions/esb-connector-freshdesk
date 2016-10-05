@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="createCompany" xmlns="http://ws.apache.org/ns/synapse">
     <!--Required Parameters-->
     <parameter name="name" description="Name of the Company."/>

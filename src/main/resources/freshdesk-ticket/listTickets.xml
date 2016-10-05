@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="listTickets" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="predefinedFilters"
                description="The various filters available are new_and_my_open, watching, spam, deleted."/>

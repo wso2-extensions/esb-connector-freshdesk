@@ -16,7 +16,6 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
 <template name="getForum" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="forumId" description="The unique identifier of the Forum."/>
     <sequence>
