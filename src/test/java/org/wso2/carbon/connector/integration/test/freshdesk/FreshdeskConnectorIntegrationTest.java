@@ -19,7 +19,6 @@
 package org.wso2.carbon.connector.integration.test.freshdesk;
 
 import org.apache.axiom.om.util.Base64;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
@@ -29,19 +28,13 @@ import org.wso2.connector.integration.test.base.ConnectorIntegrationTestBase;
 import org.wso2.connector.integration.test.base.RestResponse;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestBase {
 
     private Map<String, String> esbRequestHeadersMap = new HashMap<String, String>();
-
     private Map<String, String> apiRequestHeadersMap = new HashMap<String, String>();
-
-    private SimpleDateFormat sdf;
 
     /**
      * Set up the environment.
@@ -49,15 +42,676 @@ public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestB
     @BeforeClass(alwaysRun = true)
     public void setEnvironment() throws Exception {
 
-        init("freshdesk-connector-1.0.1-SNAPSHOT");
-        sdf = new SimpleDateFormat("yyyy-MM-dd");
+        init("freshdesk-connector-2.0.0");
         esbRequestHeadersMap.put("Accept-Charset", "UTF-8");
         esbRequestHeadersMap.put("Content-Type", "application/json");
-
         apiRequestHeadersMap.putAll(esbRequestHeadersMap);
-        final String authString = connectorProperties.getProperty("apiKey") + ":X";
-        final String authorizationHeader = "Basic " + Base64.encode(authString.getBytes());
+        String authString = connectorProperties.getProperty("apiKey") + ":X";
+        String authorizationHeader = "Basic " + Base64.encode(authString.getBytes());
         apiRequestHeadersMap.put("Authorization", authorizationHeader);
+    }
+
+    /**
+     * Positive test case for createCompany method with mandatory parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {createCompany} integration test with mandatory parameters.")
+    public void testCreateCompanyWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createCompany");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createCompany_mandatory.json");
+        String companyId = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("companyId", companyId);
+        String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/companies/" + companyId;
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("name"), apiRestResponse.getBody().getString("name"));
+    }
+
+    /**
+     * Positive test case for createCompany method with optional parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {createCompany} integration test with mandatory parameters.")
+    public void testCreateCompanyWithOptionalParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createCompany");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createCompany_optional.json");
+        String companyIdOptional = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("companyIdOptional", companyIdOptional);
+
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/companies/" + companyIdOptional;
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("name"), apiRestResponse.getBody().getString("name"));
+    }
+
+    /**
+     * Negative test case for createCompany method.
+     */
+    @Test(priority = 1, description = "FreshDesk {createCompany} integration test with mandatory parameters.")
+    public void testCreateCompanyWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createCompany");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createCompany_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/companies";
+        RestResponse<JSONObject> apiRestResponse =
+                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createCompany_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for getCompany method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateCompanyWithMandatoryParameters"},
+            description = "FreshDesk {getCompany} integration test with mandatory parameters.")
+    public void testGetCompanyWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getCompany");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getCompany_mandatory.json");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/companies/"
+                        + connectorProperties.getProperty("companyId");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Negative test case for getCompany method.
+     */
+    @Test(priority = 1, description = "FreshDesk {getCompany} integration test with negative parameters.")
+    public void testGetCompanyWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getCompany");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getCompany_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/companies/INVALID";
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Test case for listCompanies method with mandatory parameter.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateCompanyWithMandatoryParameters"}, description = "freshdesk {listCompanies} integration test with mandatory parameters.")
+    public void testListCompaniesWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listCompanies");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/companies/";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listCompanies_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
+    }
+
+    /**
+     * Test case for listCompanyFields method with mandatory parameter.
+     */
+    @Test(priority = 1, description = "freshdesk {listCompanyFields} integration test with mandatory parameters.")
+    public void testListCompanyFieldsWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listCompanyFields");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/company_fields";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listCompanyFields_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
+    }
+
+    /**
+     * Test case for updateCompany method with optional parameter.
+     */
+    @Test(enabled = true, dependsOnMethods = {"testGetCompanyWithMandatoryParameters"}, description = "freshdesk {updateCompany} integration test with optional parameters.")
+    public void testUpdateCompanyWithOptionalParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateCompany");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/companies/" + connectorProperties.getProperty("companyId");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateCompany_optional.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("name"), apiRestResponse.getBody().getString("name"));
+    }
+
+    /**
+     * Negative test case for updateCompany method.
+     */
+    @Test(priority = 1, description = "freshdesk {updateCompany} integration test with negative case.")
+    public void testUpdateCompanyWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateCompany");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/companies/Negative";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateCompany_negative.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for deleteCompany method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testUpdateCompanyWithOptionalParameters"}, description = "FreshDesk {deleteCompany} integration test with mandatory parameters.")
+    public void testDeleteCompanyWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:deleteCompany");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/companies/"
+                        + connectorProperties.getProperty("companyId");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteCompany_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 204);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 404);
+    }
+
+    /**
+     * Negative test case for deleteCompany method.
+     */
+    @Test(priority = 1, groups = {"wso2.esb"}, description = "freshdesk {deleteCompany} integration test with negative case.")
+    public void testDeleteCompanyWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:deleteCompany");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/companies/Invalid";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteCompany_negative.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "DELETE", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for getBusinessHour method with mandatory parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {getBusinessHour} integration test with mandatory parameters.")
+    public void testGetBusinessHourWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getBusinessHour");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getBusinessHour_mandatory.json");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/business_hours/"
+                        + connectorProperties.getProperty("businessHourId");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Negative test case for getBusinessHour method.
+     */
+    @Test(priority = 1, description = "FreshDesk {getBusinessHour} integration test with negative parameters.")
+    public void testGetBusinessHourWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getBusinessHour");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getBusinessHour_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/business_hours/INVALID";
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 404);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Test case for listBusinessHours method with mandatory parameter.
+     */
+    @Test(priority = 1, description = "freshdesk {listBusinessHours} integration test with mandatory parameters.")
+    public void testListBusinessHoursWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listBusinessHours");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/business_hours";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listBusinessHours_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
+    }
+
+    /**
+     * Positive test case for createComment method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTopicWithOptionalParameters"}, description = "FreshDesk {createComment} integration test with mandatory parameters.")
+    public void testCreateCommentWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createComment");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createComment_mandatory.json");
+        String commentId = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("commentId", commentId);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+    }
+
+    /**
+     * Negative test case for createComment method.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTopicWithOptionalParameters"}, description = "FreshDesk {createComment} integration test with mandatory parameters.")
+    public void testCreateCommentWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createComment");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createComment_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/" + connectorProperties.getProperty("topicIdOptional") + "/comments";
+        RestResponse<JSONObject> apiRestResponse =
+                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createComment_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for deleteComment method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateCommentWithMandatoryParameters"}, description = "FreshDesk {deleteComment} integration test with mandatory parameters.")
+    public void testDeleteCommentWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:deleteComment");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteComment_mandatory.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 204);
+    }
+
+    /**
+     * Negative test case for deleteComment method.
+     */
+    @Test(priority = 1, groups = {"wso2.esb"}, description = "freshdesk {deleteComment} integration test with negative case.")
+    public void testDeleteCommentWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:deleteComment");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/comments/Invalid";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteComment_negative.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "DELETE", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for createContact method with mandatory parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {createContact} integration test with mandatory parameters.")
+    public void testCreateContactWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createContact");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createContact_mandatory.json");
+        String contactId = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("contactId", contactId);
+
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/contacts/" + contactId;
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("email"), apiRestResponse.getBody().getString("email"));
+    }
+
+    /**
+     * Positive test case for createContact method with optional parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {createContact} integration test with mandatory parameters.")
+    public void testCreateContactWithOptionalParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createContact");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createContact_optional.json");
+        String contactIdOptional = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("contactIdOptional", contactIdOptional);
+
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/contacts/" + contactIdOptional;
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("email"), apiRestResponse.getBody().getString("email"));
+    }
+
+    /**
+     * Negative test case for createContact method.
+     */
+    @Test(priority = 1, description = "FreshDesk {createContact} integration test with mandatory parameters.")
+    public void testCreateContactWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createContact");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createContact_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/contacts";
+        RestResponse<JSONObject> apiRestResponse =
+                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createContact_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for getContact method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateContactWithMandatoryParameters"},
+            description = "FreshDesk {getContact} integration test with mandatory parameters.")
+    public void testGetContactWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getContact");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getContact_mandatory.json");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/contacts/"
+                        + connectorProperties.getProperty("contactId");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Negative test case for getContact method.
+     */
+    @Test(priority = 1, description = "FreshDesk {getContact} integration test with negative parameters.")
+    public void testGetContactWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getContact");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getContact_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/contacts/INVALID";
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Test case for listContacts method with mandatory parameter.
+     */
+    @Test(priority = 1, description = "freshdesk {listContacts} integration test with mandatory parameters.")
+    public void testListContactsWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listContacts");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/contacts";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listContacts_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
+    }
+
+    /**
+     * Test case for listContacts method with optional parameter.
+     */
+    @Test(priority = 1, description = "freshdesk {listContacts} integration test with mandatory parameters.")
+    public void testListContactsWithOptionalParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listContacts");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/contacts?company_id=19000007803";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listContacts_optional.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+    }
+
+    /**
+     * Positive test case for createNote method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {createNote} integration test with mandatory parameters.")
+    public void testCreateNoteWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createNote");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createNote_mandatory.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+    }
+
+    /**
+     * Positive test case for createNote method with optional parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {createNote} integration test with mandatory parameters.")
+    public void testCreateNoteWithOptionalParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createNote");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createNote_optional.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+    }
+
+    /**
+     * Negative test case for createNote method.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {createNote} integration test with mandatory parameters.")
+    public void testCreateNoteWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createNote");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createNote_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/7/notes";
+        RestResponse<JSONObject> apiRestResponse =
+                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createNote_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for createReply method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {createReply} integration test with mandatory parameters.")
+    public void testCreateReplyWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createReply");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createReply_mandatory.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+    }
+
+    /**
+     * Positive test case for createReply method with optional parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {createReply} integration test with mandatory parameters.")
+    public void testCreateReplyWithOptionalParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createReply");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createReply_optional.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+    }
+
+    /**
+     * Negative test case for createReply method.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {createReply} integration test with mandatory parameters.")
+    public void testCreateReplyWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createReply");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createReply_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/7/reply";
+        RestResponse<JSONObject> apiRestResponse =
+                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createReply_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for createForum method with mandatory parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {createForum} integration test with mandatory parameters.")
+    public void testCreateForumWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createForum");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createForum_mandatory.json");
+        String forumId = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("forumId", forumId);
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/" + connectorProperties.getProperty("forumId");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("name"), apiRestResponse.getBody().getString("name"));
+    }
+
+    /**
+     * Positive test case for createForum method with optional parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {createForum} integration test with mandatory parameters.")
+    public void testCreateForumWithOptionalParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createForum");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createForum_optional.json");
+        String forumIdOptional = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("forumIdOptional", forumIdOptional);
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/" + connectorProperties.getProperty("forumIdOptional");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("name"), apiRestResponse.getBody().getString("name"));
+    }
+
+    /**
+     * Negative test case for createForum method.
+     */
+    @Test(priority = 1, description = "FreshDesk {createForum} integration test with mandatory parameters.")
+    public void testCreateForumWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createForum");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createForum_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/categories/" + connectorProperties.getProperty("categoryId") + "/forums";
+        RestResponse<JSONObject> apiRestResponse =
+                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createForum_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for getForum method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateForumWithMandatoryParameters"},
+            description = "FreshDesk {getForum} integration test with mandatory parameters.")
+    public void testGetForumWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getForum");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getForum_mandatory.json");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/"
+                        + connectorProperties.getProperty("forumId");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Negative test case for getForum method.
+     */
+    @Test(priority = 1, description = "FreshDesk {getForum} integration test with negative parameters.")
+    public void testGetForumWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getForum");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getForum_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/INVALID";
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Test case for updateForum method with optional parameter.
+     */
+    @Test(enabled = true, dependsOnMethods = {"testCreateForumWithOptionalParameters"}, description = "freshdesk {updateForum} integration test with optional parameters.")
+    public void testUpdateForumWithOptionalParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateForum");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/" + connectorProperties.getProperty("forumIdOptional");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateForum_optional.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("name"), apiRestResponse.getBody().getString("name"));
+    }
+
+    /**
+     * Negative test case for updateForum method.
+     */
+    @Test(priority = 1, description = "freshdesk {updateForum} integration test with negative case.")
+    public void testUpdateForumWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateForum");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/Negative";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateForum_negative.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Positive test case for getProduct method with mandatory parameters.
+     */
+    @Test(priority = 1, description = "FreshDesk {getProduct} integration test with mandatory parameters.")
+    public void testGetProductWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getProduct");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getProduct_mandatory.json");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/products/"
+                        + connectorProperties.getProperty("productId");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Negative test case for getProduct method.
+     */
+    @Test(priority = 1, description = "FreshDesk {getProduct} integration test with negative parameters.")
+    public void testGetProductWithNegativeCase() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:getProduct");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getProduct_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/products/Negative";
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        System.out.print("Response ESB" + esbRestResponse.getHttpStatusCode());
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
+
+    /**
+     * Test case for listProducts method with mandatory parameter.
+     */
+    @Test(priority = 1, description = "freshdesk {listProducts} integration test with mandatory parameters.")
+    public void testListProductsWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listProducts");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/products";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listProducts_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
+    }
+
+    /**
+     * Test case for listSLAPolicies method with mandatory parameter.
+     */
+    @Test(priority = 1, description = "freshdesk {listSLAPolicies} integration test with mandatory parameters.")
+    public void testListSLAPoliciesWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listSLAPolicies");
+        final String apiUrl =
+                connectorProperties.getProperty("apiUrl") + "/api/v2/sla_policies";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listSLAPolicies_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
+    }
+
+    /**
+     * Test case for updateSLAPolicy method with mandatory parameter.
+     */
+    @Test(enabled = true, description = "freshdesk {updateSLAPolicy} integration test with mandatory parameters.")
+    public void testupdateSLAPolicyWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateSLAPolicy");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateSLAPolicy_mandatory.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+    }
+
+    /**
+     * Negative test case for updateSLAPolicy method.
+     */
+    @Test(priority = 1, description = "freshdesk {updateSLAPolicy} integration test with negative case.")
+    public void testupdateSLAPolicyWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateSLAPolicy");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateSLAPolicy_negative.json");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 404);
     }
 
     /**
@@ -69,21 +723,14 @@ public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestB
         esbRequestHeadersMap.put("Action", "urn:createTicket");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createTicket_mandatory.json");
-        String ticketId = esbRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("display_id");
+        String ticketId = String.valueOf(esbRestResponse.getBody().getLong("id"));
         connectorProperties.put("ticketId", ticketId);
 
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/" + ticketId + ".json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/" + ticketId;
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final String createdAt =
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("created_at").split("T")[0];
-
-        final String email[] = connectorProperties.getProperty("email").split("@");
-        final String name = email[email.length - 2];
-
-        Assert.assertEquals(createdAt, sdf.format(new Date()));
-        Assert.assertEquals(apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("requester_name")
-                .toLowerCase(), name.toLowerCase());
-
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
     }
 
     /**
@@ -95,140 +742,77 @@ public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestB
         esbRequestHeadersMap.put("Action", "urn:createTicket");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createTicket_optional.json");
-        final String ticketId = esbRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("display_id");
-        connectorProperties.put("ticketIdOptional", ticketId);
+        String ticketIdOptional = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("ticketIdOptional", ticketIdOptional);
 
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/" + ticketId + ".json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/" + ticketIdOptional;
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final String createdAt =
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("created_at").split("T")[0];
-
-        Assert.assertEquals(createdAt, sdf.format(new Date()));
-        Assert.assertEquals(connectorProperties.getProperty("ticketDescription"), apiRestResponse.getBody()
-                .getJSONObject("helpdesk_ticket").getString("description"));
-        Assert.assertEquals(connectorProperties.getProperty("source"),
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("source"));
-        Assert.assertEquals(connectorProperties.getProperty("status"),
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("status"));
-
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
     }
 
     /**
-     * Negative test case for createTicket method with mandatory parameters.
+     * Negative test case for createTicket method.
      */
-    @Test(priority = 1, description = "FreshDesk {createTicket} integration test with negative case.")
+    @Test(priority = 1, description = "FreshDesk {createTicket} integration test with mandatory parameters.")
     public void testCreateTicketWithNegativeCase() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:createTicket");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createTicket_negative.json");
-
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets.json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets";
         RestResponse<JSONObject> apiRestResponse =
                 sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createTicket_negative.json");
-
         Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-
     }
 
     /**
      * Positive test case for getTicket method with mandatory parameters.
      */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {getTicket} integration test with mandatory parameters.")
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"},
+            description = "FreshDesk {getTicket} integration test with mandatory parameters.")
     public void testGetTicketWithMandatoryParameters() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:getTicket");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getTicket_mandatory.json");
-
         final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketId") + ".json";
+                connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/"
+                        + connectorProperties.getProperty("ticketId");
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
 
         Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("requester_name"),
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("requester_name"));
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("description"),
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("description"));
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("requester_id"),
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("requester_id"));
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("display_id"),
-                apiRestResponse.getBody().getJSONObject("helpdesk_ticket").getString("display_id"));
-
     }
 
     /**
-     * Negative test case for getTicket method with mandatory parameters.
+     * Negative test case for getTicket method.
      */
-    @Test(priority = 1, description = "FreshDesk {getTicket} integration test with negative case.")
+    @Test(priority = 1, description = "FreshDesk {getTicket} integration test with negative parameters.")
     public void testGetTicketWithNegativeCase() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:getTicket");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getTicket_negative.json");
-
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/INVALID.json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/INVALID";
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-
         Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("errors").getString("error"), apiRestResponse
-                .getBody().getJSONObject("errors").getString("error"));
-
     }
 
     /**
-     * Positive test case for listCustomers method with mandatory parameters.
+     * Test case for listTicketFields method with mandatory parameter.
      */
-    @Test(priority = 1, description = "FreshDesk {listCustomers} integration test with mandatory parameters.")
-    public void testListCustomersWithMandatoryParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:listCustomers");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listCustomers_mandatory.json");
-        JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/customers.json";
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiResponseArray = new JSONArray(apiRestResponse.getBody().getString("output"));
-
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-        final int length = esbResponseArray.length();
-
-        Assert.assertEquals(length, apiResponseArray.length());
-        if (length > 0) {
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getJSONObject("customer").getString("id"),
-                    apiResponseArray.getJSONObject(0).getJSONObject("customer").getString("id"));
-        }
-    }
-
-    /**
-     * Positive test case for listCustomers method with optional parameters.
-     */
-    @Test(priority = 1, description = "FreshDesk {listCustomers} integration test with optional parameters.")
-    public void testListCustomersWithOptionalParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:listCustomers");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listCustomers_optional.json");
-        final JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-
+    @Test(priority = 1, description = "freshdesk {listTicketFields} integration test with mandatory parameters.")
+    public void testListTicketFieldsWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:listTicketFields");
         final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/customers.json?letter="
-                        + connectorProperties.getProperty("letter");
+                connectorProperties.getProperty("apiUrl") + "/api/v2/ticket_fields";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listTicketFields_mandatory.json");
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiResponseArray = new JSONArray(apiRestResponse.getBody().getString("output"));
-
-        final int length = esbResponseArray.length();
-        Assert.assertEquals(length, apiResponseArray.length());
-        // Asserting the id's of the customers returned as part of the response.
-        if (length > 0) {
-
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getJSONObject("customer").getString("id"),
-                    apiResponseArray.getJSONObject(0).getJSONObject("customer").getString("id"));
-
-        }
-
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
     }
 
     /**
@@ -240,22 +824,9 @@ public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestB
         esbRequestHeadersMap.put("Action", "urn:listTickets");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listTickets_mandatory.json");
-        final JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets.json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets";
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiResponseArray = new JSONArray(apiRestResponse.getBody().getString("output"));
-
-        final int length = esbResponseArray.length();
-
-        Assert.assertEquals(length, apiResponseArray.length());
-        // Asserting the id's of the tickets that were returned as part of the
-        // response.
-        if (length > 0) {
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getString("id"), apiResponseArray.getJSONObject(0)
-                    .getString("id"));
-        }
-
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
     }
 
     /**
@@ -267,498 +838,210 @@ public class FreshdeskConnectorIntegrationTest extends ConnectorIntegrationTestB
         esbRequestHeadersMap.put("Action", "urn:listTickets");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listTickets_optional.json");
-        final JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-
         final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets.json?company_name="
-                        + connectorProperties.getProperty("companyName") + "&filter_name="
-                        + connectorProperties.getProperty("filterName");
+                connectorProperties.getProperty("apiUrl") + "/api/v2/tickets?filter="
+                        + connectorProperties.getProperty("predefinedFilter") + "&order_type="
+                        + connectorProperties.getProperty("orderType");
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiResponseArray = new JSONArray(apiRestResponse.getBody().getString("output"));
-
-        final int length = esbResponseArray.length();
-        Assert.assertEquals(length, apiResponseArray.length());
-        // Asserting the id's of the tickets that were returned as part of the
-        // response.
-        if (length > 0) {
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getString("id"), apiResponseArray.getJSONObject(0)
-                    .getString("id"));
-        }
-
+        Assert.assertEquals(esbRestResponse.getBody().toString(), apiRestResponse.getBody().toString());
     }
 
     /**
-     * Positive test case for updateTicket method with optional parameters.
+     * Positive test case for deleteTicket method with mandatory parameters.
      */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {updateTicket} integration test with optional parameters.")
-    public void testUpdateTicketWithOptionalParameters() throws IOException, JSONException {
+    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithOptionalParameters"}, description = "FreshDesk {deleteTicket} integration test with mandatory parameters.")
+    public void testDeleteTicketWithMandatoryParameters() throws IOException, JSONException {
 
-        esbRequestHeadersMap.put("Action", "urn:updateTicket");
-
+        esbRequestHeadersMap.put("Action", "urn:deleteTicket");
         final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketId") + ".json";
-
-        RestResponse<JSONObject> apiRestResponseInitial = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final String initialSubject =
-                apiRestResponseInitial.getBody().getJSONObject("helpdesk_ticket").getString("subject");
-        final String initialPriority =
-                apiRestResponseInitial.getBody().getJSONObject("helpdesk_ticket").getString("priority_name");
-
-        sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateTicket_optional.json");
-
-        RestResponse<JSONObject> apiRestResponseEventual = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final String eventualSubject =
-                apiRestResponseEventual.getBody().getJSONObject("helpdesk_ticket").getString("subject");
-        final String eventualPriority =
-                apiRestResponseEventual.getBody().getJSONObject("helpdesk_ticket").getString("priority_name");
-
-        Assert.assertNotEquals(initialSubject, eventualSubject);
-        Assert.assertNotEquals(initialPriority, eventualPriority);
+                connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/"
+                        + connectorProperties.getProperty("ticketIdOptional");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteTicket_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 204);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getBody().getString("deleted"), "true");
     }
 
     /**
-     * Positive test case for updateTicket method with negative case.
+     * Negative test case for deleteTicket method.
      */
-    @Test(priority = 1, description = "FreshDesk {updateTicket} integration test with negative case.")
-    public void testUpdateTicketWithNegativeCase() throws IOException, JSONException {
+    @Test(priority = 1, groups = {"wso2.esb"}, description = "freshdesk {deleteTicket} integration test with negative case.")
+    public void testDeleteTicketWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:deleteTicket");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/Invalid";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteTicket_negative.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "DELETE", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
 
+    /**
+     * Test case for updateTicket method with optional parameter.
+     */
+    @Test(enabled = true, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "freshdesk {updateForum} integration test with optional parameters.")
+    public void testUpdateTicketWithOptionalParameters() throws IOException, JSONException {
         esbRequestHeadersMap.put("Action", "urn:updateTicket");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/" + connectorProperties.getProperty("ticketId");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateTicket_optional.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(esbRestResponse.getBody().getString("description"), apiRestResponse.getBody().getString("description"));
+    }
+
+    /**
+     * Negative test case for updateTicket method.
+     */
+    @Test(priority = 1, description = "freshdesk {updateTicket} integration test with negative case.")
+    public void testUpdateTicketWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateTicket");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/tickets/Negative";
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateTicket_negative.json");
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketId") + ".json";
-        RestResponse<JSONObject> apiRestResponse =
-                sendJsonRestRequest(apiUrl, "PUT", apiRequestHeadersMap, "api_updateTicket_negative.json");
-
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
         Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-        Assert.assertEquals(esbRestResponse.getBody().getJSONArray("errors").getString(0), apiRestResponse.getBody()
-                .getJSONArray("errors").getString(0));
-
-    }
-
-    /**
-     * Positive test case for assignTicket method with mandatory parameters.
-     */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters",
-            "testListUsersWithMandatoryParameters"}, description = "FreshDesk {assignTicket} integration test with mandatory parameters.")
-    public void testAssignTicketWithMandatoryParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:assignTicket");
-
-        // Get the responder_id of the ticket - Get ticket call
-        final String apiUrlGetTicket =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketId") + ".json";
-        RestResponse<JSONObject> apiRestResponseGetTicket =
-                sendJsonRestRequest(apiUrlGetTicket, "GET", apiRequestHeadersMap);
-
-        // Initially responder_id should be null
-        Assert.assertTrue(apiRestResponseGetTicket.getBody().getJSONObject("helpdesk_ticket").getString("responder_id")
-                .equals("null"));
-
-        // Assign the ticket to a user/agent
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_assignTicket_mandatory.json");
-        final JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-        final String responderName =
-                esbResponseArray.getJSONObject(0).getJSONObject("ticket").getString("responder_name");
-
-        // Get the responder_id of the ticket - Get ticket call
-        apiRestResponseGetTicket = sendJsonRestRequest(apiUrlGetTicket, "GET", apiRequestHeadersMap);
-        final String responderId =
-                apiRestResponseGetTicket.getBody().getJSONObject("helpdesk_ticket").getString("responder_id");
-
-        // Get the corresponding name of the user whose responder_id is obtained
-        // above
-        final String apiUrlGetUser = connectorProperties.getProperty("apiUrl") + "/contacts/" + responderId + ".json";
-        RestResponse<JSONObject> apiRestResponseGetUser = sendJsonRestRequest(apiUrlGetUser, "GET", apiRequestHeadersMap);
-
-        Assert.assertEquals(responderId, connectorProperties.getProperty("userId"));
-        Assert.assertEquals(responderName, apiRestResponseGetUser.getBody().getJSONObject("user").getString("name"));
-
-    }
-
-    /**
-     * Negative test case for assignTicket method with mandatory parameters.
-     */
-    @Test(priority = 1, description = "FreshDesk {assignTicket} integration test with negative case.")
-    public void testAssignTicketWithNegativeCase() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:assignTicket");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_assignTicket_negative.json");
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketId") + "/assign.json?responder_id=INVALID";
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "PUT", apiRequestHeadersMap);
-
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("errors").getString("error"), apiRestResponse
-                .getBody().getJSONObject("errors").getString("error"));
-
-    }
-
-    /**
-     * Positive test case for listUsers method with mandatory parameters.
-     */
-    @Test(priority = 1, description = "FreshDesk {listUsers} integration test with mandatory parameters.")
-    public void testListUsersWithMandatoryParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:listUsers");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listUsers_mandatory.json");
-        JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/contacts.json?state="
-                        + connectorProperties.getProperty("state");
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        JSONArray apiResponseArray = new JSONArray(apiRestResponse.getBody().getString("output"));
-
-        final int length = esbResponseArray.length();
-
-        Assert.assertEquals(length, apiResponseArray.length());
-        // Asserting the id's and emails of the users returned as part of the
-        // response.
-        if (length > 0) {
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getJSONObject("user").getString("id"), apiResponseArray
-                    .getJSONObject(0).getJSONObject("user").getString("id"));
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getJSONObject("user").getString("email"),
-                    apiResponseArray.getJSONObject(0).getJSONObject("user").getString("email"));
-            connectorProperties.put("userId", esbResponseArray.getJSONObject(0).getJSONObject("user").getString("id"));
-        }
-
-    }
-
-    /**
-     * Positive test case for listUsers method with optional parameters.
-     */
-    @Test(priority = 1, description = "FreshDesk {listUsers} integration test with optional parameters.")
-    public void testListUsersWithOptionalParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:listUsers");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_listUsers_optional.json");
-        final JSONArray esbResponseArray = new JSONArray(esbRestResponse.getBody().getString("output"));
-
-        final String query = "email is " + connectorProperties.getProperty("userEmail");
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/contacts.json?query=" + URLEncoder.encode(query, "UTF-8")
-                        + "&state=" + connectorProperties.getProperty("state");
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiResponseArray = new JSONArray(apiRestResponse.getBody().getString("output"));
-
-        final int length = esbResponseArray.length();
-        Assert.assertEquals(length, apiResponseArray.length());
-        // Asserting the id's and emails of the users returned as part of the
-        // response.
-        if (length > 0) {
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getJSONObject("user").getString("id"), apiResponseArray
-                    .getJSONObject(0).getJSONObject("user").getString("id"));
-            Assert.assertEquals(esbResponseArray.getJSONObject(0).getJSONObject("user").getString("email"),
-                    apiResponseArray.getJSONObject(0).getJSONObject("user").getString("email"));
-        }
-
-    }
-
-    /**
-     * Positive test case for addNote method with mandatory parameters.
-     */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithMandatoryParameters"}, description = "FreshDesk {addNote} integration test with mandatory parameters.")
-    public void testAddNoteWithMandatoryParameters() throws IOException, JSONException {
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketId") + ".json";
-        RestResponse<JSONObject> apiRestResponse1 = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiNotes1 = apiRestResponse1.getBody().getJSONObject("helpdesk_ticket").getJSONArray("notes");
-
-        esbRequestHeadersMap.put("Action", "urn:addNote");
-        sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_addNote_mandatory.json");
-
-        RestResponse<JSONObject> apiRestResponse2 = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiNotes2 = apiRestResponse2.getBody().getJSONObject("helpdesk_ticket").getJSONArray("notes");
-        final JSONObject note = (JSONObject) apiNotes2.getJSONObject(0).get("note");
-        final String createdAt = note.getString("created_at").split("T")[0];
-
-        Assert.assertNotEquals(apiNotes1, apiNotes2);
-        Assert.assertEquals(createdAt, sdf.format(new Date()));
-
-    }
-
-    /**
-     * Positive test case for addNote method with optional parameters.
-     */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTicketWithOptionalParameters"}, description = "FreshDesk {addNote} integration test with optional parameters.")
-    public void testAddNoteWithOptionalParameters() throws IOException, JSONException {
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/helpdesk/tickets/"
-                        + connectorProperties.getProperty("ticketIdOptional") + ".json";
-
-        RestResponse<JSONObject> apiRestResponse1 = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiNotes1 = apiRestResponse1.getBody().getJSONObject("helpdesk_ticket").getJSONArray("notes");
-
-        esbRequestHeadersMap.put("Action", "urn:addNote");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_addNote_optional.json");
-
-        RestResponse<JSONObject> apiRestResponse2 = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        final JSONArray apiNotes2 = apiRestResponse2.getBody().getJSONObject("helpdesk_ticket").getJSONArray("notes");
-
-        Assert.assertNotEquals(apiNotes1, apiNotes2);
-
-        JSONObject note = new JSONObject();
-        final String noteId = esbRestResponse.getBody().getJSONObject("note").getString("id");
-
-        // The position of the note object in API response changes time to time.
-        if (noteId.equals(apiNotes2.getJSONObject(0).getJSONObject("note").getString("id"))) {
-            note = apiNotes2.getJSONObject(0).getJSONObject("note");
-        } else if (noteId.equals(apiNotes2.getJSONObject(1).getJSONObject("note").getString("id"))) {
-            note = apiNotes2.getJSONObject(1).getJSONObject("note");
-        } else if (noteId.equals(apiNotes2.getJSONObject(2).getJSONObject("note").getString("id"))) {
-            note = apiNotes2.getJSONObject(2).getJSONObject("note");
-        }
-
-        Assert.assertEquals(connectorProperties.getProperty("noteBody"), note.getString("body"));
-        final String createdAt = note.getString("created_at").split("T")[0];
-        Assert.assertEquals(createdAt, sdf.format(new Date()));
-        Assert.assertEquals(connectorProperties.getProperty("private"), note.getString("private"));
-    }
-
-    /**
-     * Positive test case for getUser method with mandatory parameters.
-     */
-    @Test(priority = 1, description = "FreshDesk {getUser} integration test with mandatory parameters.")
-    public void testGetUserWithMandatoryParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:getUser");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getUser_mandatory.json");
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/contacts/" + connectorProperties.getProperty("userId")
-                        + ".json";
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("user").getString("email"), apiRestResponse.getBody()
-                .getJSONObject("user").getString("email"));
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("user").getString("name"), apiRestResponse.getBody()
-                .getJSONObject("user").getString("name"));
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("user").getString("created_at"), apiRestResponse
-                .getBody().getJSONObject("user").getString("created_at"));
-    }
-
-    /**
-     * Negative test case for getUser method.
-     */
-    @Test(priority = 1, description = "FreshDesk {getUser} integration test with negative case.")
-    public void testGetUserWithNegativeCase() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:getUser");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getUser_negative.json");
-
-        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/contacts/invalid.json";
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("errors").toString(), apiRestResponse.getBody()
-                .getJSONObject("errors").toString());
     }
 
     /**
      * Positive test case for createTopic method with mandatory parameters.
      */
-    @Test(priority = 1, description = "FreshDesk {createTopic} integration test with mandatory parameters.")
+    @Test(priority = 1, dependsOnMethods = {"testCreateForumWithMandatoryParameters"}, description = "FreshDesk {createTopic} integration test with mandatory parameters.")
     public void testCreateTopicWithMandatoryParameters() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:createTopic");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createTopic_mandatory.json");
-        JSONObject topic = esbRestResponse.getBody().getJSONObject("topic");
-        String topicId = topic.getString("id");
+        String topicId = String.valueOf(esbRestResponse.getBody().getLong("id"));
         connectorProperties.put("topicId", topicId);
 
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/categories/" + connectorProperties.getProperty("categoryId")
-                        + "/forums/" + connectorProperties.getProperty("forumId") + "/topics/"
-                        + connectorProperties.getProperty("topicId") + ".json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/" + topicId;
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        JSONObject apiTopic = apiRestResponse.getBody().getJSONObject("topic");
-        JSONArray posts = apiTopic.getJSONArray("posts");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+    }
 
-        Assert.assertEquals(topic.getString("title"), connectorProperties.getProperty("subject"));
-        Assert.assertEquals(topic.getString("forum_id"), connectorProperties.getProperty("forumId"));
-        Assert.assertEquals(posts.getJSONObject(0).getString("body"), connectorProperties.getProperty("noteBody"));
+    /**
+     * Positive test case for createTopic method with optional parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testCreateForumWithMandatoryParameters"}, description = "FreshDesk {createTopic} integration test with mandatory parameters.")
+    public void testCreateTopicWithOptionalParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createTopic");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createTopic_optional.json");
+        String topicIdOptional = String.valueOf(esbRestResponse.getBody().getLong("id"));
+        connectorProperties.put("topicIdOptional", topicIdOptional);
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/" + topicIdOptional;
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 201);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
     }
 
     /**
      * Negative test case for createTopic method.
      */
-    @Test(priority = 1, description = "FreshDesk {createTopic} integration test with negative case.")
+    @Test(priority = 1, dependsOnMethods = {"testCreateForumWithMandatoryParameters"}, description = "FreshDesk {createTopic} integration test with mandatory parameters.")
     public void testCreateTopicWithNegativeCase() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:createTopic");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createTopic_negative.json");
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/categories/" + connectorProperties.getProperty("categoryId")
-                        + "/forums/" + connectorProperties.getProperty("forumId") + "/topics.json";
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/forums/19000062773/topics";
         RestResponse<JSONObject> apiRestResponse =
                 sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createTopic_negative.json");
-
-        JSONArray esb = new JSONArray(esbRestResponse.getBody().getString("output"));
-        String esbTitle = (String) esb.getJSONArray(0).get(0);
-        String esbError = (String) esb.getJSONArray(0).get(1);
-        JSONArray api = new JSONArray(apiRestResponse.getBody().getString("output"));
-        String apiTitle = (String) api.getJSONArray(0).get(0);
-        String apiError = (String) api.getJSONArray(0).get(1);
-
-        Assert.assertEquals(esbTitle, apiTitle);
-        Assert.assertEquals(esbError, apiError);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
     }
 
     /**
      * Positive test case for getTopic method with mandatory parameters.
      */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTopicWithMandatoryParameters"}, description = "FreshDesk {getTopic} integration test with mandatory parameters.")
+    @Test(priority = 1, dependsOnMethods = {"testCreateTopicWithMandatoryParameters"},
+            description = "FreshDesk {getTopic} integration test with mandatory parameters.")
     public void testGetTopicWithMandatoryParameters() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:getTopic");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getTopic_mandatory.json");
-
         final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/categories/" + connectorProperties.getProperty("categoryId")
-                        + "/forums/" + connectorProperties.getProperty("forumId") + "/topics/"
-                        + connectorProperties.getProperty("topicId") + ".json";
+                connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/"
+                        + connectorProperties.getProperty("topicId");
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
 
-        JSONObject esbTopic = esbRestResponse.getBody().getJSONObject("topic");
-        JSONObject apiTopic = apiRestResponse.getBody().getJSONObject("topic");
-
-        Assert.assertEquals(esbTopic.getString("id"), apiTopic.getString("id"));
-        Assert.assertEquals(esbTopic.getJSONArray("posts").getJSONObject(0).getString("id"),
-                apiTopic.getJSONArray("posts").getJSONObject(0).getString("id"));
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
     }
 
     /**
      * Negative test case for getTopic method.
      */
-    @Test(priority = 1, description = "FreshDesk {getTopic} integration test with negative case.")
+    @Test(priority = 1, description = "FreshDesk {getTopic} integration test with negative parameters.")
     public void testGetTopicWithNegativeCase() throws IOException, JSONException {
 
         esbRequestHeadersMap.put("Action", "urn:getTopic");
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_getTopic_negative.json");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/INVALID";
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
 
+    /**
+     * Positive test case for deleteTopic method with mandatory parameters.
+     */
+    @Test(priority = 1, dependsOnMethods = {"testUpdateTopicWithOptionalParameters"}, description = "FreshDesk {deleteCompany} integration test with mandatory parameters.")
+    public void testDeleteTopicWithMandatoryParameters() throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:deleteTopic");
         final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/categories/" + connectorProperties.getProperty("categoryId")
-                        + "/forums/" + connectorProperties.getProperty("forumId") + "/topics/.json";
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap);
-
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 404);
+                connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/"
+                        + connectorProperties.getProperty("topicId");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteTopic_mandatory.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 204);
         Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 404);
     }
 
     /**
-     * Positive test case for createPost method with mandatory parameters.
+     * Negative test case for deleteTopic method.
      */
-    @Test(priority = 1, dependsOnMethods = {"testCreateTopicWithMandatoryParameters"}, description = "FreshDesk {createPost} integration test with mandatory parameters.")
-    public void testCreatePostWithMandatoryParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:createPost");
+    @Test(priority = 1, description = "freshdesk {deleteTopic} integration test with negative case.")
+    public void testDeleteTopicWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:deleteTopic");
+        final String apiUrl = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/Invalid";
         RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createPost_mandatory.json");
-        JSONObject posts = esbRestResponse.getBody().getJSONObject("post");
-        String postId = posts.getString("id");
-        connectorProperties.put("postId", postId);
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/categories/" + connectorProperties.getProperty("categoryId")
-                        + "/forums/" + connectorProperties.getProperty("forumId") + "/topics/"
-                        + connectorProperties.getProperty("topicId") + ".json";
-        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        JSONObject topic = apiRestResponse.getBody().getJSONObject("topic");
-        JSONArray postsInTopic = topic.getJSONArray("posts");
-
-        Assert.assertEquals(posts.getString("forum_id"), connectorProperties.getProperty("forumId"));
-        Assert.assertEquals(posts.getString("topic_id"), connectorProperties.getProperty("topicId"));
-        Assert.assertEquals(postsInTopic.getJSONObject(1).getString("body"), connectorProperties.getProperty("subject"));
-    }
-
-    /**
-     * Negative test case for createPost method.
-     */
-    @Test(priority = 1, description = "FreshDesk {createPost} integration test with negative case.")
-    public void testCreatePostWithNegativeCase() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:createPost");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_createPost_negative.json");
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/posts.json?forum_id="
-                        + connectorProperties.getProperty("forumId") + "&category_id=invalid&topic_id="
-                        + connectorProperties.getProperty("topicId");
-        RestResponse<JSONObject> apiRestResponse =
-                sendJsonRestRequest(apiUrl, "POST", apiRequestHeadersMap, "api_createPost_negative.json");
-
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 302);
-        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 302);
-    }
-
-    /**
-     * Positive test case for deletePost method with mandatory parameters.
-     */
-    @Test(priority = 1, dependsOnMethods = {"testCreatePostWithMandatoryParameters"}, description = "FreshDesk {deletePost} integration test with mandatory parameters.")
-    public void testDeletePostWithMandatoryParameters() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:deletePost");
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/categories/" + connectorProperties.getProperty("categoryId")
-                        + "/forums/" + connectorProperties.getProperty("forumId") + "/topics/"
-                        + connectorProperties.getProperty("topicId") + ".json";
-        RestResponse<JSONObject> apiRestResponseBefore = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-
-        JSONObject topicBefore = apiRestResponseBefore.getBody().getJSONObject("topic");
-        JSONArray postsBefore = topicBefore.getJSONArray("posts");
-
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deletePost_mandatory.json");
-
-        RestResponse<JSONObject> apiRestResponseAfter = sendJsonRestRequest(apiUrl, "GET", apiRequestHeadersMap);
-        JSONObject topicAfter = apiRestResponseAfter.getBody().getJSONObject("topic");
-        JSONArray postsAfter = topicAfter.getJSONArray("posts");
-
-        Assert.assertNotEquals(postsBefore.length(), postsAfter.length());
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
-    }
-
-    /**
-     * Negative test case for deletePost method.
-     */
-    @Test(priority = 1, description = "FreshDesk {deletePost} integration test with negative case.")
-    public void testDeletePostWithNegativeCase() throws IOException, JSONException {
-
-        esbRequestHeadersMap.put("Action", "urn:deletePost");
-        RestResponse<JSONObject> esbRestResponse =
-                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deletePost_negative.json");
-
-        final String apiUrl =
-                connectorProperties.getProperty("apiUrl") + "/posts/invalid.json?forum_id="
-                        + connectorProperties.getProperty("forumId") + "&category_id=invalid&topic_id="
-                        + connectorProperties.getProperty("topicId");
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_deleteTopic_negative.json");
         RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiUrl, "DELETE", apiRequestHeadersMap);
-
-        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 302);
-        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 302);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
     }
 
+    /**
+     * Test case for updateTopic method with optional parameter.
+     */
+    @Test(enabled = true, dependsOnMethods = {"testCreateTopicWithMandatoryParameters"}, description = "freshdesk {updateTopic} integration test with optional parameters.")
+    public void testUpdateTopicWithOptionalParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateTopic");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/"
+                + connectorProperties.getProperty("topicId");
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateTopic_optional.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 200);
+        Assert.assertEquals(apiRestResponse.getHttpStatusCode(), 200);
+    }
+
+    /**
+     * Negative test case for updateTopic method.
+     */
+    @Test(priority = 1, description = "freshdesk {updateTopic} integration test with negative case.")
+    public void testUpdateTopicWithNegativeCase() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:updateTopic");
+        String apiEndPoint = connectorProperties.getProperty("apiUrl") + "/api/v2/discussions/topics/Negative";
+        RestResponse<JSONObject> esbRestResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "esb_updateTopic_negative.json");
+        RestResponse<JSONObject> apiRestResponse = sendJsonRestRequest(apiEndPoint, "GET", apiRequestHeadersMap);
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), apiRestResponse.getHttpStatusCode());
+    }
 }

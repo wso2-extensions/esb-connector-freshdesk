@@ -1,8 +1,4 @@
-{  
-   "topic":{  
-      "sticky":1,
-      "locked":0,
-      "title":"",
-      "body_html":"invalid"
-   }
+{
+  "message": "",
+  "title": ""
 }

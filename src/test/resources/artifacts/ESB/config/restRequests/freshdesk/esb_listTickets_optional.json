@@ -1,8 +1,13 @@
 {
-	"apiUrl":"%s(apiUrl)",
-	"apiKey":"%s(apiKey)",
-	"format":"json",
-	"filterType":"%s(filterType)",
-	"filterName":"%s(filterName)",
-	"companyName":"%s(companyName)"
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
+  "predefinedFilters": "%s(predefinedFilter)",
+  "requesterId": "%s(requesterId)",
+  "updatedSince": "",
+  "companyId": "",
+  "email": "test@gmail.com",
+  "orderBy": "",
+  "orderType": "%s(orderType)",
+  "include": "%s(include)"
 }

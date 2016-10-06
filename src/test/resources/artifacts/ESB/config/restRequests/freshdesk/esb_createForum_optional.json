@@ -1,0 +1,11 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
+  "name": "%s(forumNameOptional)",
+  "forumType": "%s(forumType)",
+  "categoryId": "%s(categoryId)",
+  "forumVisibility": "%s(forumVisibility)",
+  "description": "%s(description)",
+  "companyIds": "%s(companyIds)"
+}

@@ -1,8 +1,28 @@
 {
-	"apiUrl":"%s(apiUrl)",
-	"apiKey":"%s(apiKey)",
-	"format":"json",
-	"ticketId":"%s(ticketId)",
-	"subject":"%s(subject)",
-	"priority":"%s(priority)"
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
+  "ticketId": "%s(ticketId)",
+  "requesterId": "",
+  "email": "testTicketOpt@gmail.com",
+  "facebookId": "",
+  "phone": "%s(phone)",
+  "twitterId": "test",
+  "name": "abc",
+  "subject": "eeee",
+  "description": "eeeee",
+  "emailConfigId": "",
+  "frDueBy": "",
+  "groupId": "",
+  "productId": "",
+  "source": "",
+  "type": "issue",
+  "responderId": "",
+  "customFields": {
+    "z": "tttt"
+  },
+  "dueBy": "",
+  "priority": "1",
+  "status": "2"
 }
+

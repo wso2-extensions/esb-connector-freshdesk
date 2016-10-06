@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+<template name="createReply" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters-->
+    <parameter name="bodyMessage" description="Content of the note in HTML."/>
+    <parameter name="ticketId" description="Unique value of ticket."/>
+    <!--Supported Parameters-->
+    <parameter name="fromEmail" description="The email address from which the reply is sent."/>
+    <parameter name="ccEmails" description="Email address added in the 'cc' field of the outgoing ticket email."/>
+    <parameter name="bccEmails" description="Email address added in the 'bcc' field of the outgoing ticket email."/>
+    <parameter name="userId" description="ID of the agent/user who is adding the note."/>
+    <sequence>
+        <property name="uri.var.bodyMessage" expression="$func:bodyMessage"/>
+        <property name="uri.var.ticketId" expression="$func:ticketId"/>
+        <property name="uri.var.fromEmail" expression="$func:fromEmail"/>
+        <property name="uri.var.ccEmails" expression="$func:ccEmails"/>
+        <property name="uri.var.bccEmails" expression="$func:bccEmails"/>
+        <property name="uri.var.userId" expression="$func:userId"/>
+        <script language="js">
+            <![CDATA[
+                //request body param variables
+                var bodyMessage = mc.getProperty('uri.var.bodyMessage');
+                var fromEmail = mc.getProperty('uri.var.fromEmail');
+                var ccEmails = mc.getProperty('uri.var.ccEmails');
+                var bccEmails = mc.getProperty('uri.var.bccEmails');
+                var userId = mc.getProperty('uri.var.userId');
+                var query = '{';
+                if (bodyMessage != null && bodyMessage != "") {
+                   query = query.concat('"'+'body":"' + bodyMessage+'",');
+                }
+                if (ccEmails != null && ccEmails != "" && ccEmails!="[]") {
+                    var ccEmailsArray = eval( "('" + ccEmails + "')" );
+                    query = query.concat('"cc_emails":' + ccEmailsArray +',');
+                }
+                if (bccEmails != null && bccEmails != "" && bccEmails!="[]") {
+                    var bccEmailsArray = eval( "('" + bccEmails + "')" );
+                    query = query.concat('"bcc_emails":' + bccEmailsArray +',');
+                }
+                if (fromEmail != null && fromEmail != "") {
+                    query = query.concat('"'+'from_email":"' + fromEmail+'",');
+                }
+                if (userId != null && userId != "") {
+                    query = query.concat('"'+'user_id":' + userId+',');
+                }
+                query = query.substring(0, query.length-1);
+                mc.setProperty('uri.var.query', query);
+            ]]>
+        </script>
+        <payloadFactory media-type="json">
+            <format>
+                $1}
+            </format>
+            <args>
+                <arg expression="$ctx:uri.var.query"/>
+            </args>
+        </payloadFactory>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="post"
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{+uri.var.ticketId}/reply"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="post"
+                              uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/tickets/{+uri.var.ticketId}/reply"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+        <header name="ETag" scope="transport" action="remove"/>
+    </sequence>
+</template>

@@ -1,0 +1,17 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
+  "bodyMessage": "",
+  "ticketId": "%s(ticketId)",
+  "fromEmail": "support@wso2yasho.freshdesk.com",
+  "ccEmails": [
+    "testReply3@gmail.com",
+    "testReply4@gmail.com"
+  ],
+  "bccEmails": [
+    "testReply3@gmail.com",
+    "testReply4@gmail.com"
+  ],
+  "userId": ""
+}

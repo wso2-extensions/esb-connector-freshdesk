@@ -1,9 +1,30 @@
 {
-	"apiUrl":"%s(apiUrl)",
-	"apiKey":"%s(apiKey)",
-	"format":"json",
-	"email":"%s(email)",
-	"source":"%s(source)",
-	"status":"%s(status)",
-	"description":"%s(ticketDescription)"
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
+  "requesterId": "19000247627",
+  "email": "tom@outerspace.com",
+  "facebookId": "",
+  "phone": "%s(phone)",
+  "twitterId": "testTwitter",
+  "name": "%s(ticketName)",
+  "description": "%s(description)",
+  "subject": "%s(subject)",
+  "emailConfigId": "",
+  "frDueBy": "%s(frDueBy)",
+  "groupId": "",
+  "productId": "",
+  "source": "",
+  "type": "issue",
+  "responderId": "",
+  "ccEmails": [
+    "test1@gmail.com",
+    "test2@gmail.com"
+  ],
+  "customFields": {
+    "z": "test"
+  },
+  "dueBy": "%s(dueBy)",
+  "priority": "%s(priority)",
+  "status": "%s(status)"
 }

@@ -1,6 +1,7 @@
 {
-  "helpdesk_ticket":{
-     
-     }
-      
+  "requesterId": "",
+  "email": "",
+  "facebookId": "",
+  "phone": "",
+  "twitterId": ""
 }

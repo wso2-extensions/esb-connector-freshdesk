@@ -1,0 +1,9 @@
+{
+  "apiUrl": "%s(apiUrl)",
+  "apiKey": "%s(apiKey)",
+  "apiVersion": "%s(apiVersion)",
+  "name": "",
+  "email": "negative",
+  "mobile": "",
+  "phone": ""
+}

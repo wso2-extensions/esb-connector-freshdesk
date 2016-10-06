@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+<template name="listContacts" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Supported Parameters-->
+    <parameter name="email" description="Email address of the contact."/>
+    <parameter name="mobile" description="Mobile number of the contact."/>
+    <parameter name="phone" description="Phone number of the contact."/>
+    <parameter name="companyId" description="Company Id of the contact."/>
+    <parameter name="state" description="State of the contact."/>
+    <sequence>
+        <property name="uri.var.email" expression="$func:email"/>
+        <property name="uri.var.mobile" expression="$func:mobile"/>
+        <property name="uri.var.phone" expression="$func:phone"/>
+        <property name="uri.var.companyId" expression="$func:companyId"/>
+        <property name="uri.var.state" expression="$func:state"/>
+        <property name="uri.var.apiParameters" value=""/>
+        <filter xpath="(not($ctx:uri.var.email = '' or (not(string($ctx:uri.var.email)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'email=', $ctx:uri.var.email, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.mobile = '' or (not(string($ctx:uri.var.mobile)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'mobile=', $ctx:uri.var.mobile, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.phone = '' or (not(string($ctx:uri.var.phone)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'phone=', $ctx:uri.var.phone, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.companyId = '' or (not(string($ctx:uri.var.companyId)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'company_id=', $ctx:uri.var.companyId, '&amp;')"/>
+            </then>
+        </filter>
+        <filter xpath="(not($ctx:uri.var.state = '' or (not(string($ctx:uri.var.state)))))">
+            <then>
+                <property name="uri.var.apiParameters"
+                          expression="fn:concat($ctx:uri.var.apiParameters, 'state=', $ctx:uri.var.state, '&amp;')"/>
+            </then>
+        </filter>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <filter source="$ctx:freshdeskBlocking" regex="true">
+            <then>
+                <call blocking="true">
+                    <endpoint>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/contacts?{+uri.var.apiParameters}"/>
+                    </endpoint>
+                </call>
+            </then>
+            <else>
+                <call>
+                    <endpoint>
+                        <http method="get" uri-template="{uri.var.apiUrl}/api/{+uri.var.apiVersion}/contacts?{+uri.var.apiParameters}"/>
+                    </endpoint>
+                </call>
+            </else>
+        </filter>
+        <!-- Remove response custom header information -->
+        <header name="X-Runtime" scope="transport" action="remove"/>
+        <header name="X-Powered-By" scope="transport" action="remove"/>
+    </sequence>
+</template>
