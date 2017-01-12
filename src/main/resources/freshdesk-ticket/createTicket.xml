@@ -150,7 +150,6 @@
                 }
                 query = query.substring(0, query.length-1);
                 mc.setProperty('uri.var.query', query);
-
             ]]>
         </script>
         <payloadFactory media-type="json">
