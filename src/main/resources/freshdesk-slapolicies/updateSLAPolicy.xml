@@ -18,10 +18,8 @@
 -->
 <template name="updateSLAPolicy" xmlns="http://ws.apache.org/ns/synapse">
     <!--Required Parameters-->
-    <parameter name="applicableTo"
-               description="Key Value pair of the object and the array of object IDs denoting the conditions based on which the SLA policy is to be applied"/>
-    <parameter name="policyId"
-               description="Unique value of SLA Policy."/>
+    <parameter name="applicableTo" description="Key Value pair of the object denoting conditions based on SLA policy."/>
+    <parameter name="policyId" description="Unique value of SLA Policy."/>
     <sequence>
         <property name="uri.var.applicableTo" expression="$func:applicableTo"/>
         <property name="uri.var.policyId" expression="$func:policyId"/>
