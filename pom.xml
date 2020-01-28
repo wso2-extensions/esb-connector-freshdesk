@@ -34,7 +34,7 @@
         <synapse.version>2.1.3-wso2v11</synapse.version>
         <carbon.mediation.version>4.4.10</carbon.mediation.version>
         <json.version>2.0.0.wso2v1</json.version>
-        <carbon.integration.framework>4.0.0</carbon.integration.framework>
+        <carbon.integration.framework>4.1.0</carbon.integration.framework>
         <org.testng.version>6.1.1</org.testng.version>
         <integration.base.version>1.0.1</integration.base.version>
     </properties>
